@@ -576,9 +576,11 @@ public class LineSeries extends Series implements ILineSeries {
 
         // draw symbol and label
         for (int i = 0; i < xseries.length; i++) {
-            Color color = getSymbolColor();
-            if (symbolColors != null && symbolColors.length > i) {
-                color = symbolColors[i];
+            Color color;
+            if (symbolColors != null && symbolColors.length > indexes[i]) {
+                color = symbolColors[indexes[i]];
+            } else {
+                color = getSymbolColor();
             }
             int h, v;
             if (xAxis.isHorizontalAxis()) {
