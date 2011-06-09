@@ -7,6 +7,7 @@
 package org.swtchart.internal;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -14,6 +15,8 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
@@ -32,6 +35,12 @@ public class Title extends Canvas implements ITitle, PaintListener {
     /** the title text */
     protected String text;
 
+    /** the style ranges */
+    private StyleRange[] styleRanges;
+
+    /** The text layout */
+    private final TextLayout textLayout;
+
     /** the visibility state of axis */
     protected boolean isVisible;
 
@@ -49,7 +58,7 @@ public class Title extends Canvas implements ITitle, PaintListener {
 
     /**
      * Constructor.
-     *
+     * 
      * @param parent
      *            the parent composite
      * @param style
@@ -64,6 +73,8 @@ public class Title extends Canvas implements ITitle, PaintListener {
 
         defaultFont = new Font(Display.getDefault(), "Tahoma",
                 DEFAULT_FONT_SIZE, SWT.BOLD);
+        textLayout = new TextLayout(Display.getDefault());
+
         setFont(defaultFont);
         setForeground(Display.getDefault().getSystemColor(DEFAULT_FOREGROUND));
 
@@ -74,17 +85,22 @@ public class Title extends Canvas implements ITitle, PaintListener {
      * @see ITitle#setText(String)
      */
     public void setText(String text) {
+        String title;
         if (text == null) {
-            this.text = getDefaultText();
+            title = getDefaultText();
         } else {
-            this.text = text;
+            title = text;
         }
+
+        textLayout.setText(title);
+        this.text = title;
+
         chart.updateLayout(); // text could be changed to blank
     }
 
     /**
      * Gets the default title text.
-     *
+     * 
      * @return the default title text
      */
     protected String getDefaultText() {
@@ -125,6 +141,29 @@ public class Title extends Canvas implements ITitle, PaintListener {
     }
 
     /*
+     * @see ITitle#setStyleRanges(StyleRange[])
+     */
+    public void setStyleRanges(StyleRange[] ranges) {
+        styleRanges = ranges;
+        if (styleRanges != null) {
+            for (StyleRange range : styleRanges) {
+                if (range != null) {
+                    textLayout.setStyle(range, range.start, range.start
+                            + range.length);
+                }
+            }
+        }
+        chart.updateLayout();
+    }
+
+    /*
+     * @see ITitle#getStyleRanges()
+     */
+    public StyleRange[] getStyleRanges() {
+        return styleRanges;
+    }
+
+    /*
      * @see Control#setVisible(boolean)
      */
     @Override
@@ -147,7 +186,7 @@ public class Title extends Canvas implements ITitle, PaintListener {
 
     /**
      * Gets the state indicating if showing title horizontally.
-     *
+     * 
      * @return the state indicating if showing title horizontally
      */
     protected boolean isHorizontal() {
@@ -161,13 +200,20 @@ public class Title extends Canvas implements ITitle, PaintListener {
         int height;
         int width;
         if (isVisible() && !text.trim().equals("")) {
-            Point p = Util.getExtentInGC(getFont(), text);
-            width = p.x;
-            height = p.y;
+            if (styleRanges == null) {
+                Point p = Util.getExtentInGC(getFont(), text);
+                width = p.x;
+                height = p.y;
+            } else {
+                Rectangle r = textLayout.getBounds();
+                width = r.width;
+                height = r.height;
+            }
         } else {
             width = 0;
             height = 0;
         }
+
         if (isHorizontal()) {
             setLayoutData(new ChartLayoutData(width, height));
         } else {
@@ -184,61 +230,105 @@ public class Title extends Canvas implements ITitle, PaintListener {
         if (!defaultFont.isDisposed()) {
             defaultFont.dispose();
         }
+        if (!textLayout.isDisposed()) {
+            textLayout.dispose();
+        }
     }
 
     /*
      * @see PaintListener#paintControl(PaintEvent)
      */
     public void paintControl(PaintEvent e) {
-
         if (text == null || text.equals("") || !isVisible) {
             return;
         }
 
-        int width = getSize().x;
-        int height = getSize().y;
-        GC gc = e.gc;
-        gc.setForeground(getForeground());
-        gc.setFont(getFont());
-
         if (isHorizontal()) {
-            int textWidth = gc.textExtent(text).x;
-            int x = (int) (width / 2.0 - textWidth / 2.0);
-            if (x < 0) {
-                // this happens when window size is too small
-                x = 0;
-            }
-
-            gc.drawString(text, x, 0, true);
+            drawHorizontalTitle(e.gc);
         } else {
+            drawVerticalTitle(e.gc);
+        }
+    }
 
-            // create image to draw text
-            int textWidth = gc.textExtent(text).x;
-            int textHeight = gc.textExtent(text).y;
-            Image image = new Image(Display.getCurrent(), textWidth, textHeight);
-            GC tmpGc = new GC(image);
+    /**
+     * Draws the horizontal title.
+     * 
+     * @param gc
+     *            The graphics context
+     */
+    private void drawHorizontalTitle(GC gc) {
+        boolean useStyleRanges = styleRanges != null;
+
+        int width = getSize().x;
+        int textWidth;
+        if (useStyleRanges) {
+            textWidth = textLayout.getBounds().width;
+        } else {
+            textWidth = gc.textExtent(text).x;
+        }
+
+        int x = (int) (width / 2d - textWidth / 2d);
+        if (x < 0) {
+            // this happens when window size is too small
+            x = 0;
+        }
+
+        if (useStyleRanges) {
+            textLayout.draw(gc, x, 0);
+        } else {
+            gc.drawText(text, x, 0, true);
+        }
+    }
+
+    /**
+     * Draws the vertical title.
+     * 
+     * @param gc
+     *            The graphics context
+     */
+    private void drawVerticalTitle(GC gc) {
+        boolean useStyleRanges = styleRanges != null;
+
+        int textWidth;
+        int textHeight;
+        if (useStyleRanges) {
+            textWidth = textLayout.getBounds().width;
+            textHeight = textLayout.getBounds().height;
+        } else {
+            textWidth = gc.textExtent(text).x;
+            textHeight = gc.textExtent(text).y;
+        }
+
+        // create image to draw text
+        Image image = new Image(Display.getCurrent(), textWidth, textHeight);
+        GC tmpGc = new GC(image);
+
+        if (useStyleRanges) {
+            textLayout.draw(tmpGc, 0, 0);
+        } else {
             tmpGc.setForeground(getForeground());
             tmpGc.setBackground(getBackground());
             tmpGc.setFont(getFont());
             tmpGc.drawText(text, 0, 0);
-
-            // set transform to rotate
-            Transform transform = new Transform(gc.getDevice());
-            transform.translate(0, textWidth);
-            transform.rotate(270);
-            gc.setTransform(transform);
-
-            // draw the image on the rotated graphics context
-            int y = (int) (height / 2d - textWidth / 2d);
-            if (y < 0) {
-                y = 0;
-            }
-            gc.drawImage(image, -y, 0);
-
-            // dispose resources
-            tmpGc.dispose();
-            transform.dispose();
-            image.dispose();
         }
+
+        // set transform to rotate
+        Transform transform = new Transform(gc.getDevice());
+        transform.translate(0, textWidth);
+        transform.rotate(270);
+        gc.setTransform(transform);
+
+        // draw the image on the rotated graphics context
+        int height = getSize().y;
+        int y = (int) (height / 2d - textWidth / 2d);
+        if (y < 0) {
+            y = 0;
+        }
+        gc.drawImage(image, -y, 0);
+
+        // dispose resources
+        tmpGc.dispose();
+        transform.dispose();
+        image.dispose();
     }
 }

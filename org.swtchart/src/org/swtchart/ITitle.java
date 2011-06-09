@@ -6,6 +6,7 @@
  *******************************************************************************/
 package org.swtchart;
 
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
@@ -58,6 +59,25 @@ public interface ITitle {
      * @return the foreground color of title
      */
     public Color getForeground();
+
+    /**
+     * Sets the style ranges. When style ranges are set, the font and background
+     * color set by {@link #setFont(Font)} and {@link #setForeground(Color)}
+     * makes no effect. Instead, the font and background color in style ranges
+     * are used.
+     * 
+     * @param styleRanges
+     *            the style ranges, or <tt>null</tt> to clear the currently set
+     *            style ranges.
+     */
+    public void setStyleRanges(StyleRange[] styleRanges);
+
+    /**
+     * Gets the style ranges.
+     * 
+     * @return the style ranges
+     */
+    public StyleRange[] getStyleRanges();
 
     /**
      * Sets the visibility state of title.
