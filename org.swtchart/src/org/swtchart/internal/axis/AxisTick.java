@@ -1,12 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2008-2011 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2011 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 package org.swtchart.internal.axis;
 
 import java.text.Format;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -47,7 +48,7 @@ public class AxisTick implements IAxisTick {
 
     /**
      * Constructor.
-     * 
+     *
      * @param chart
      *            the chart
      * @param axis
@@ -66,7 +67,7 @@ public class AxisTick implements IAxisTick {
 
     /**
      * Gets the axis tick marks.
-     * 
+     *
      * @return the axis tick marks
      */
     public AxisTickMarks getAxisTickMarks() {
@@ -75,7 +76,7 @@ public class AxisTick implements IAxisTick {
 
     /**
      * Gets the axis tick labels.
-     * 
+     *
      * @return the axis tick labels
      */
     public AxisTickLabels getAxisTickLabels() {
@@ -209,9 +210,23 @@ public class AxisTick implements IAxisTick {
         }
     }
 
+    /*
+     * @see IAxisTick#getTickLabelValues()
+     */
+    public double[] getTickLabelValues() {
+        List<Double> list = axisTickLabels.getTickLabelValues();
+
+        double[] values = new double[list.size()];
+        for (int i = 0; i < values.length; i++) {
+            values[i] = list.get(i);
+        }
+
+        return values;
+    }
+
     /**
      * Updates the tick around per 64 pixel.
-     * 
+     *
      * @param length
      *            the axis length
      */

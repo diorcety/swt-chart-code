@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2011 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2011 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -94,7 +94,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Constructor.
-     * 
+     *
      * @param chart
      *            the chart
      * @param axis
@@ -141,7 +141,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Sets the foreground color.
-     * 
+     *
      * @param color
      *            the foreground color
      */
@@ -156,7 +156,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the foreground color.
-     * 
+     *
      * @return the foreground color
      */
     protected Color getForeground() {
@@ -169,7 +169,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates the tick labels.
-     * 
+     *
      * @param length
      *            the axis length
      */
@@ -194,7 +194,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for date axis.
-     * 
+     *
      * @param length
      *            the length of axis
      */
@@ -232,7 +232,7 @@ public class AxisTickLabels implements PaintListener {
      * Updates the tick label for month or year. The month and year are handled
      * differently from other units of time, since 1 month and 1 year can be
      * different depending on which time to start counting.
-     * 
+     *
      * @param length
      *            the length of axis
      * @param gridStepHint
@@ -298,7 +298,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for category axis.
-     * 
+     *
      * @param length
      *            the length of axis
      */
@@ -325,7 +325,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for log scale.
-     * 
+     *
      * @param length
      *            the length of axis
      */
@@ -372,7 +372,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for normal scale.
-     * 
+     *
      * @param length
      *            axis length (>0)
      */
@@ -384,7 +384,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for normal scale.
-     * 
+     *
      * @param length
      *            axis length (>0)
      * @param tickStep
@@ -487,7 +487,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the tick step unit.
-     * 
+     *
      * @param gridStepHint
      *            the grid step hint
      * @return the tick step unit.
@@ -510,7 +510,7 @@ public class AxisTickLabels implements PaintListener {
     /**
      * Gets the period in milliseconds of given unit of date and amount. The
      * period is calculated based on UTC of January 1, 1970.
-     * 
+     *
      * @param unit
      *            the unit of time like <tt>Calendar.YEAR<tt>.
      * @param amount
@@ -526,7 +526,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Formats the given object.
-     * 
+     *
      * @param obj
      *            the object
      * @return the formatted string
@@ -559,7 +559,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Checks if the tick label is major (...,0.01,0.1,1,10,100,...).
-     * 
+     *
      * @param tickValue
      *            the tick label value
      * @return true if the tick label is major
@@ -578,7 +578,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Returns the state indicating if there is a space to draw tick label.
-     * 
+     *
      * @param previousPosition
      *            the previously drawn tick label position.
      * @param tickLabelPosition
@@ -622,7 +622,7 @@ public class AxisTickLabels implements PaintListener {
     /**
      * Calculates the value of the first argument raised to the power of the
      * second argument.
-     * 
+     *
      * @param base
      *            the base
      * @param expornent
@@ -642,7 +642,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the grid step.
-     * 
+     *
      * @param lengthInPixels
      *            axis length in pixels
      * @param min
@@ -702,7 +702,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the tick label positions.
-     * 
+     *
      * @return the tick label positions
      */
     public ArrayList<Integer> getTickLabelPositions() {
@@ -710,8 +710,17 @@ public class AxisTickLabels implements PaintListener {
     }
 
     /**
+     * Gets the tick label values.
+     *
+     * @return the tick label values
+     */
+    protected ArrayList<Double> getTickLabelValues() {
+        return tickLabelValues;
+    }
+
+    /**
      * Sets the font.
-     * 
+     *
      * @param font
      *            the font
      */
@@ -725,7 +734,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the font.
-     * 
+     *
      * @return the font
      */
     protected Font getFont() {
@@ -737,7 +746,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the layout data.
-     * 
+     *
      * @return the layout data
      */
     public ChartLayoutData getLayoutData() {
@@ -746,7 +755,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Sets the bounds on chart panel.
-     * 
+     *
      * @param x
      *            the x coordinate
      * @param y
@@ -762,7 +771,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the bounds on chart panel.
-     * 
+     *
      * @return the bounds on chart panel
      */
     protected Rectangle getBounds() {
@@ -820,7 +829,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Draw the X tick.
-     * 
+     *
      * @param gc
      *            the graphics context
      */
@@ -861,7 +870,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Draws the rotated text.
-     * 
+     *
      * @param gc
      *            the graphics context
      * @param text
@@ -905,7 +914,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Draw the Y tick.
-     * 
+     *
      * @param gc
      *            the graphics context
      */
@@ -939,7 +948,7 @@ public class AxisTickLabels implements PaintListener {
      * <tt>Data[]</tt> series respectively.
      * <p>
      * If <tt>null</tt> is set, default format will be used.
-     * 
+     *
      * @param format
      *            the format
      */
@@ -949,7 +958,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the format for axis tick label.
-     * 
+     *
      * @return the format
      */
     protected Format getFormat() {
