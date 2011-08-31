@@ -195,7 +195,8 @@ public class Axis implements IAxis {
         }
 
         if (Double.isNaN(range.lower) || Double.isNaN(range.upper)
-                || range.lower > range.upper) {
+                || Double.isInfinite(range.lower)
+                || Double.isInfinite(range.upper) || range.lower > range.upper) {
             throw new IllegalArgumentException("Illegal range: " + range);
         }
 
