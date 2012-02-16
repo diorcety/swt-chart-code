@@ -114,8 +114,9 @@ public class CompressLineSeries extends Compress {
                 }
             } else {
                 if (isPrevOutOfRange) {
-                    if (index > 0 && ySeries[index - 1] < yLower
-                            && ySeries[index] > yUpper) {
+                    if (index > 0
+                            && ((ySeries[index - 1] < yLower && ySeries[index] > yUpper) || ySeries[index - 1] > yUpper
+                                    && ySeries[index] < yLower)) {
                         state = STATE.SteppingOverYRange;
                     } else if (index > 0 && xSeries[index - 1] < xLower
                             && xSeries[index] > xLower) {
