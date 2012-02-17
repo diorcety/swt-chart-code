@@ -6,18 +6,25 @@
  *******************************************************************************/
 package org.swtchart;
 
+import java.util.EventListener;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TypedListener;
 import org.swtchart.internal.ChartLayout;
 import org.swtchart.internal.ChartLayoutData;
 import org.swtchart.internal.ChartTitle;
@@ -359,16 +366,78 @@ public class Chart extends Composite implements Listener {
      *            the format (SWT.IMAGE_*). The supported formats depend on OS.
      */
     public void save(String filename, int format) {
-        Point size = getSize();
-        GC gc = new GC(this);
-        Image image = new Image(Display.getDefault(), size.x, size.y);
-        gc.copyArea(image, 0, 0);
-        gc.dispose();
+        Image image = new Image(Display.getDefault(), getBounds());
+
+        renderOffscreenImage(image);
 
         ImageData data = image.getImageData();
         ImageLoader loader = new ImageLoader();
         loader.data = new ImageData[] { data };
         loader.save(filename, format);
         image.dispose();
+    }
+
+    /**
+     * Renders off-screen image.
+     * 
+     * @param image
+     *            The image to render off-screen
+     */
+    public void renderOffscreenImage(Image image) {
+        GC gc = new GC(image);
+
+        gc.setFont(getFont());
+        gc.setBackground(getBackground());
+        gc.setForeground(getForeground());
+        gc.fillRectangle(getBounds());
+
+        paintControl(this, gc);
+
+        for (Control child : getChildren()) {
+            Rectangle r = child.getBounds();
+            Transform transform = new Transform(getDisplay());
+            transform.translate(r.x, r.y);
+
+            gc.setTransform(transform);
+            gc.setFont(child.getFont());
+            gc.setBackground(child.getBackground());
+            gc.setForeground(child.getForeground());
+
+            paintControl(child, gc);
+
+            transform.dispose();
+        }
+
+        gc.dispose();
+    }
+
+    /**
+     * Paints with the given graphics context with the paint listeners
+     * registered in given control.
+     * 
+     * @param control
+     *            The control
+     * @param gc
+     *            The graphics context
+     */
+    private static void paintControl(Control control, GC gc) {
+        for (Listener listener : control.getListeners(SWT.Paint)) {
+            if (listener instanceof TypedListener) {
+                EventListener eventListener = ((TypedListener) listener)
+                        .getEventListener();
+                if (eventListener instanceof PaintListener) {
+                    Event e = new Event();
+                    e.type = SWT.Paint;
+                    e.display = control.getDisplay();
+                    e.widget = control;
+                    e.gc = gc;
+                    e.width = gc.getClipping().width;
+                    e.height = gc.getClipping().height;
+
+                    ((PaintListener) eventListener)
+                            .paintControl(new PaintEvent(e));
+                }
+            }
+        }
     }
 }

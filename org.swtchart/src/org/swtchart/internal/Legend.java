@@ -403,6 +403,7 @@ public class Legend extends Composite implements ILegend, PaintListener {
         }
 
         // draw frame
+        gc.fillRectangle(0, 0, getSize().x - 1, getSize().y - 1);
         gc.setLineStyle(SWT.LINE_SOLID);
         gc.setLineWidth(1);
         gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
