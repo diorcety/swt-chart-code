@@ -25,6 +25,7 @@ import org.swtchart.internal.Legend;
 import org.swtchart.internal.PlotArea;
 import org.swtchart.internal.Title;
 import org.swtchart.internal.axis.AxisSet;
+import org.swtchart.internal.series.SeriesSet;
 
 /**
  * A chart which are composed of title, legend, axes and plot area.
@@ -49,6 +50,9 @@ public class Chart extends Composite implements Listener {
     /** the state indicating if compressing series is enabled */
     private boolean compressEnabled;
 
+    /** the state indicating if the update of chart appearance is suspended */
+    private boolean updateSuspended;
+
     /**
      * Constructor.
      * 
@@ -62,6 +66,7 @@ public class Chart extends Composite implements Listener {
 
         orientation = SWT.HORIZONTAL;
         compressEnabled = true;
+        updateSuspended = false;
 
         parent.layout();
 
@@ -212,6 +217,64 @@ public class Chart extends Composite implements Listener {
         return compressEnabled;
     }
 
+    /**
+     * Suspends the update of chart appearance.
+     * 
+     * <p>
+     * By default, when the chart model is changed (e.g. adding new series or
+     * changing chart properties), the chart appearance is updated accordingly.
+     * <p>
+     * However, when doing a lot of changes in the chart model at once, it is
+     * inefficient that the update happens many times unnecessarily. In this
+     * case, you may want to defer the update until completing whole model
+     * changes in order to have better performance.
+     * <p>
+     * For example, suppose there is a chart having a large number of series,
+     * the following example code disables the update during changing the model.
+     * 
+     * <pre>
+     * try {
+     *     // suspend update
+     *     chart.suspendUpdate(true);
+     * 
+     *     // do some changes for a large number of series
+     *     for (ISeries series : chart.getSeriesSet().getSeries()) {
+     *         series.enableStack(true);
+     *     }
+     * } finally {
+     *     // resume update
+     *     chart.suspendUpdate(false);
+     * }
+     * </pre>
+     * 
+     * Note that the update has to be resumed right after completing the model
+     * changes in order to avoid showing an incompletely updated chart.
+     * 
+     * @param suspend
+     *            true to suspend the update of chart appearance
+     */
+    public void suspendUpdate(boolean suspend) {
+        if (updateSuspended == suspend) {
+            return;
+        }
+        updateSuspended = suspend;
+
+        // make sure that chart is updated
+        if (!suspend) {
+            updateLayout();
+            ((SeriesSet) getSeriesSet()).updateStackAndRiserData();
+        }
+    }
+
+    /**
+     * Gets the state indicating if the update of chart appearance is suspended.
+     * 
+     * @return true if the update of chart appearance is suspended
+     */
+    public boolean isUpdateSuspended() {
+        return updateSuspended;
+    }
+
     /*
      * @see Listener#handleEvent(Event)
      */
@@ -230,6 +293,10 @@ public class Chart extends Composite implements Listener {
      * Updates the layout of chart elements.
      */
     public void updateLayout() {
+        if (updateSuspended) {
+            return;
+        }
+
         if (legend != null) {
             legend.updateLayoutData();
         }
