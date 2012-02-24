@@ -339,7 +339,7 @@ public class AxisSet implements IAxisSet {
                             .getLayoutData().widthHint;
         }
 
-        int axisWidth = chart.getSize().x
+        int axisWidth = chart.getClientArea().width
                 - axesWidth
                 - ChartLayout.MARGIN
                 * 2
@@ -377,7 +377,7 @@ public class AxisSet implements IAxisSet {
                             .getLayoutData().heightHint;
         }
 
-        int axisHeight = chart.getSize().y
+        int axisHeight = chart.getClientArea().height
                 - titleHeight
                 - axesHeight
                 - ChartLayout.MARGIN
