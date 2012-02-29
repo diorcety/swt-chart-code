@@ -188,6 +188,21 @@ public interface ISeries {
     ISeriesLabel getLabel();
 
     /**
+     * Sets the visibility state in legend.
+     * 
+     * @param visible
+     *            the visibility state in legend
+     */
+    void setVisibleInLegend(boolean visible);
+
+    /**
+     * Gets the visibility state in legend.
+     * 
+     * @return true if series is visible in legend
+     */
+    boolean isVisibleInLegend();
+
+    /**
      * Gets the pixel coordinates corresponding to the given series index.
      * 
      * @param index

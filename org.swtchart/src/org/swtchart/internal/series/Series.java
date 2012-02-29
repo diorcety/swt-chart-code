@@ -92,6 +92,9 @@ abstract public class Series implements ISeries {
 
     /** the state indicating if the type of X series is <tt>Date</tt> */
     private boolean isDateSeries;
+    
+    /** the state indicating if the series is visible in legend */
+    private boolean visibleInLegend;
 
     /** the list of dispose listeners */
     private List<IDisposeListener> listeners;
@@ -118,6 +121,7 @@ abstract public class Series implements ISeries {
         seriesLabel = new SeriesLabel();
         xErrorBar = new ErrorBar();
         yErrorBar = new ErrorBar();
+        visibleInLegend = true;
         listeners = new ArrayList<IDisposeListener>();
     }
 
@@ -587,10 +591,12 @@ abstract public class Series implements ISeries {
 
         int lowerPixelCoordinate = axis.getPixelCoordinate(range.lower,
                 range.lower, range.upper)
-                + lowerPlotMargin * (axis.isHorizontalAxis() ? -1 : 1);
+                + lowerPlotMargin
+                * (axis.isHorizontalAxis() ? -1 : 1);
         int upperPixelCoordinate = axis.getPixelCoordinate(range.upper,
                 range.lower, range.upper)
-                + upperPlotMargin * (axis.isHorizontalAxis() ? 1 : -1);
+                + upperPlotMargin
+                * (axis.isHorizontalAxis() ? 1 : -1);
 
         double lower = axis.getDataCoordinate(lowerPixelCoordinate,
                 range.lower, range.upper);
@@ -598,6 +604,20 @@ abstract public class Series implements ISeries {
                 range.lower, range.upper);
 
         return new Range(lower, upper);
+    }
+
+    /*
+     * @see ISeries#setVisibleInLegend(boolean)
+     */
+    public void setVisibleInLegend(boolean visible) {
+        visibleInLegend = visible;
+    }
+
+    /*
+     * @see ISeries#isVisibleInLegend()
+     */
+    public boolean isVisibleInLegend() {
+        return visibleInLegend;
     }
 
     /**

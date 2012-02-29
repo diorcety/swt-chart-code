@@ -224,8 +224,8 @@ public class Legend extends Composite implements ILegend, PaintListener {
         List<ISeries> sortedArray = new ArrayList<ISeries>();
         boolean isVertical = chart.getOrientation() == SWT.VERTICAL;
         for (Entry<Integer, List<ISeries>> entry : map.entrySet()) {
-            boolean isCategoryEnabled = chart.getAxisSet().getXAxis(
-                    entry.getKey()).isCategoryEnabled();
+            boolean isCategoryEnabled = chart.getAxisSet()
+                    .getXAxis(entry.getKey()).isCategoryEnabled();
             sortedArray.addAll(sort(entry.getValue(), isCategoryEnabled,
                     isVertical));
         }
@@ -237,8 +237,9 @@ public class Legend extends Composite implements ILegend, PaintListener {
      * Sorts the given series list which belongs to a certain x axis.
      * <ul>
      * <li>The stacked series will be gathered, and the order of stack series
-     * will be reversed.</li> <li>In the case of vertical orientation, the order
-     * of whole series will be reversed.</li>
+     * will be reversed.</li>
+     * <li>In the case of vertical orientation, the order of whole series will
+     * be reversed.</li>
      * </ul>
      * 
      * @param seriesList
@@ -300,6 +301,10 @@ public class Legend extends Composite implements ILegend, PaintListener {
             int maxCellWidth = 0;
 
             for (ISeries series : seriesArray) {
+                if (!series.isVisibleInLegend()) {
+                    continue;
+                }
+
                 int textWidth = Util.getExtentInGC(getFont(), series.getId()).x;
                 int cellWidth = textWidth + SYMBOL_WIDTH + MARGIN * 3;
                 maxCellWidth = Math.max(maxCellWidth, cellWidth);
@@ -321,6 +326,10 @@ public class Legend extends Composite implements ILegend, PaintListener {
             int xPosition = 0;
 
             for (ISeries series : seriesArray) {
+                if (!series.isVisibleInLegend()) {
+                    continue;
+                }
+
                 int textWidth = Util.getExtentInGC(getFont(), series.getId()).x;
                 int cellWidth = textWidth + SYMBOL_WIDTH + MARGIN * 3;
                 if (xPosition + cellWidth < r.width || xPosition == 0) {
@@ -411,6 +420,9 @@ public class Legend extends Composite implements ILegend, PaintListener {
 
         // draw content
         for (int i = 0; i < seriesArray.length; i++) {
+            if (!seriesArray[i].isVisibleInLegend()) {
+                continue;
+            }
 
             // draw plot line, symbol etc
             String id = seriesArray[i].getId();
