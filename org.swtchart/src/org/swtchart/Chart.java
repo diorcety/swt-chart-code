@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2011 SWTChart project. All rights reserved. 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
  * 
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
@@ -16,7 +16,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Composite;
@@ -184,6 +183,7 @@ public class Chart extends Composite implements Listener {
      * @param orientation
      *            the orientation which can be SWT.HORIZONTAL or SWT.VERTICAL
      */
+    @Override
     public void setOrientation(int orientation) {
         if (orientation == SWT.HORIZONTAL || orientation == SWT.VERTICAL) {
             this.orientation = orientation;
@@ -198,6 +198,7 @@ public class Chart extends Composite implements Listener {
      * 
      * @return the orientation which can be SWT.HORIZONTAL or SWT.VERTICAL
      */
+    @Override
     public int getOrientation() {
         return orientation;
     }
