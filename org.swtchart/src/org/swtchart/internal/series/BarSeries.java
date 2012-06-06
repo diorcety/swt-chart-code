@@ -243,9 +243,15 @@ public class BarSeries extends Series implements IBarSeries {
         Point size = chart.getPlotArea().getSize();
         if (x + width > size.x) {
             newWidth -= x + width - size.x + offset;
+            if (newWidth < 0) {
+                newWidth = 0;
+            }
         }
         if (y + height > size.y) {
             newHeight -= y + height - size.y + offset;
+            if (newHeight < 0) {
+                newHeight = 0;
+            }
         }
 
         return new Rectangle(newX, newY, newWidth, newHeight);
