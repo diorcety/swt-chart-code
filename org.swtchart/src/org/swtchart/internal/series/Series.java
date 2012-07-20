@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -92,7 +92,7 @@ abstract public class Series implements ISeries {
 
     /** the state indicating if the type of X series is <tt>Date</tt> */
     private boolean isDateSeries;
-    
+
     /** the state indicating if the series is visible in legend */
     private boolean visibleInLegend;
 
@@ -101,7 +101,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Constructor.
-     * 
+     *
      * @param chart
      *            the chart
      * @param id
@@ -123,6 +123,8 @@ abstract public class Series implements ISeries {
         yErrorBar = new ErrorBar();
         visibleInLegend = true;
         listeners = new ArrayList<IDisposeListener>();
+        xSeries = new double[0];
+        ySeries = new double[0];
     }
 
     /*
@@ -221,9 +223,7 @@ abstract public class Series implements ISeries {
         setCompressor();
 
         compressor.setXSeries(xSeries);
-        if (ySeries != null) {
-            compressor.setYSeries(ySeries);
-        }
+        compressor.setYSeries(ySeries);
 
         if (minX <= 0) {
             IAxis axis = chart.getAxisSet().getXAxis(xAxisId);
@@ -237,10 +237,6 @@ abstract public class Series implements ISeries {
      * @see ISeries#getXSeries()
      */
     public double[] getXSeries() {
-        if (xSeries == null) {
-            return null;
-        }
-
         double[] copiedSeries = new double[xSeries.length];
         System.arraycopy(xSeries, 0, copiedSeries, 0, xSeries.length);
 
@@ -276,7 +272,7 @@ abstract public class Series implements ISeries {
             }
         }
 
-        if (xSeries == null || xSeries.length != series.length) {
+        if (xSeries.length != series.length) {
             xSeries = new double[series.length];
             for (int i = 0; i < series.length; i++) {
                 xSeries[i] = i;
@@ -310,10 +306,6 @@ abstract public class Series implements ISeries {
      * @see ISeries#getYSeries()
      */
     public double[] getYSeries() {
-        if (ySeries == null) {
-            return null;
-        }
-
         double[] copiedSeries = new double[ySeries.length];
         System.arraycopy(ySeries, 0, copiedSeries, 0, ySeries.length);
 
@@ -342,7 +334,7 @@ abstract public class Series implements ISeries {
      */
     public Date[] getXDateSeries() {
         if (!isDateSeries) {
-            return null;
+            return new Date[0];
         }
 
         Date[] series = new Date[xSeries.length];
@@ -354,7 +346,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Gets the state indicating if date series is set.
-     * 
+     *
      * @return true if date series is set
      */
     public boolean isDateSeries() {
@@ -363,7 +355,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Gets the state indicating if the series is valid stack series.
-     * 
+     *
      * @return true if the series is valid stack series
      */
     public boolean isValidStackSeries() {
@@ -377,7 +369,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Gets the X range of series.
-     * 
+     *
      * @return the X range of series
      */
     public Range getXRange() {
@@ -387,7 +379,7 @@ abstract public class Series implements ISeries {
     /**
      * Gets the adjusted range to show all series in screen. This range includes
      * the size of plot like symbol or bar.
-     * 
+     *
      * @param axis
      *            the axis
      * @param length
@@ -398,7 +390,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Gets the Y range of series.
-     * 
+     *
      * @return the Y range of series
      */
     public Range getYRange() {
@@ -417,7 +409,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Gets the compressor.
-     * 
+     *
      * @return the compressor
      */
     protected ICompress getCompressor() {
@@ -492,7 +484,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Sets the stack series
-     * 
+     *
      * @param stackSeries
      *            The stack series
      */
@@ -525,7 +517,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Gets the pixel coordinates with given axis and series index.
-     * 
+     *
      * @param axis
      *            the axis
      * @param index
@@ -570,7 +562,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Gets the range with given margin.
-     * 
+     *
      * @param lowerPlotMargin
      *            the lower margin in pixels
      * @param upperPlotMargin
@@ -638,7 +630,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Draws series.
-     * 
+     *
      * @param gc
      *            the graphics context
      * @param width
@@ -648,8 +640,7 @@ abstract public class Series implements ISeries {
      */
     public void draw(GC gc, int width, int height) {
 
-        if (!visible || width < 0 || height < 0 || xSeries == null
-                || xSeries.length == 0 || ySeries == null
+        if (!visible || width < 0 || height < 0 || xSeries.length == 0
                 || ySeries.length == 0) {
             return;
         }
@@ -665,7 +656,7 @@ abstract public class Series implements ISeries {
 
     /**
      * Draws series.
-     * 
+     *
      * @param gc
      *            the graphics context
      * @param width

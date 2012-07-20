@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -76,7 +76,7 @@ public class Legend extends Composite implements ILegend, PaintListener {
 
     /**
      * Constructor.
-     * 
+     *
      * @param chart
      *            the chart
      * @param style
@@ -201,7 +201,7 @@ public class Legend extends Composite implements ILegend, PaintListener {
      * If there are multiple x axes, the given series array will be sorted with
      * x axis first. And then, the series in each x axis will be sorted with
      * {@link Legend#sort(List, boolean, boolean)}.
-     * 
+     *
      * @param seriesArray
      *            the series array
      * @return the sorted series array
@@ -230,7 +230,7 @@ public class Legend extends Composite implements ILegend, PaintListener {
                     isVertical));
         }
 
-        return sortedArray.toArray(new ISeries[0]);
+        return sortedArray.toArray(new ISeries[sortedArray.size()]);
     }
 
     /**
@@ -241,7 +241,7 @@ public class Legend extends Composite implements ILegend, PaintListener {
      * <li>In the case of vertical orientation, the order of whole series will
      * be reversed.</li>
      * </ul>
-     * 
+     *
      * @param seriesList
      *            the series list which belongs to a certain x axis
      * @param isCategoryEnabled
@@ -250,7 +250,7 @@ public class Legend extends Composite implements ILegend, PaintListener {
      *            true in the case of vertical orientation
      * @return the sorted series array
      */
-    private List<ISeries> sort(List<ISeries> seriesList,
+    private static List<ISeries> sort(List<ISeries> seriesList,
             boolean isCategoryEnabled, boolean isVertical) {
         List<ISeries> sortedArray = new ArrayList<ISeries>();
 
@@ -351,7 +351,7 @@ public class Legend extends Composite implements ILegend, PaintListener {
 
     /**
      * Draws the symbol of series.
-     * 
+     *
      * @param gc
      *            the graphics context
      * @param series

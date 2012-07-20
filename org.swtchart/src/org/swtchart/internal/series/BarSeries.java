@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -13,9 +13,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.swtchart.Chart;
+import org.swtchart.IAxis.Direction;
 import org.swtchart.IBarSeries;
 import org.swtchart.Range;
-import org.swtchart.IAxis.Direction;
 import org.swtchart.internal.axis.Axis;
 import org.swtchart.internal.compress.CompressBarSeries;
 import org.swtchart.internal.compress.CompressScatterSeries;
@@ -48,7 +48,7 @@ public class BarSeries extends Series implements IBarSeries {
 
     /**
      * Constructor.
-     * 
+     *
      * @param chart
      *            the chart
      * @param id
@@ -130,7 +130,7 @@ public class BarSeries extends Series implements IBarSeries {
 
     /**
      * Gets the array of bar rectangles for compressed series.
-     * 
+     *
      * @return the array of bar rectangles for compressed series
      */
     private Rectangle[] getBoundsForCompressedSeries() {
@@ -212,7 +212,7 @@ public class BarSeries extends Series implements IBarSeries {
 
     /**
      * Gets the rectangle that is visible part of given rectangle.
-     * 
+     *
      * @param x
      *            The x coordinate
      * @param y
@@ -259,7 +259,7 @@ public class BarSeries extends Series implements IBarSeries {
 
     /**
      * Sets the index of riser in a category.
-     * 
+     *
      * @param riserIndex
      *            the index of riser in a category
      */
@@ -314,7 +314,7 @@ public class BarSeries extends Series implements IBarSeries {
 
     /**
      * Gets the riser width.
-     * 
+     *
      * @param series
      *            the X series
      * @param index
@@ -364,12 +364,12 @@ public class BarSeries extends Series implements IBarSeries {
     /**
      * Gets the color for riser frame. The color will be darker or lighter than
      * the given color.
-     * 
+     *
      * @param color
      *            the riser color
      * @return the riser frame color
      */
-    private Color getFrameColor(Color color) {
+    private static Color getFrameColor(Color color) {
         int red = color.getRed();
         int green = color.getGreen();
         int blue = color.getBlue();
@@ -419,7 +419,7 @@ public class BarSeries extends Series implements IBarSeries {
 
     /**
      * Draws riser.
-     * 
+     *
      * @param gc
      *            the graphics context
      * @param h

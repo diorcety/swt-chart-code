@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -40,7 +40,7 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Constructor.
-     * 
+     *
      * @param chart
      *            the chart
      */
@@ -59,7 +59,7 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Gets the axis map for given direction.
-     * 
+     *
      * @param direction
      *            the direction
      * @return the axis map
@@ -87,7 +87,7 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Creates the axis for given direction.
-     * 
+     *
      * @param direction
      *            the direction of axis
      * @return the created axis id
@@ -107,7 +107,7 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Gets a unique axis id.
-     * 
+     *
      * @param direction
      *            the axis direction
      * @return a unique axis id
@@ -138,7 +138,7 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Gets the axis with axis id for given direction.
-     * 
+     *
      * @param id
      *            the axis id
      * @param direction
@@ -153,14 +153,16 @@ public class AxisSet implements IAxisSet {
      * @see IAxisSet#getXAxes()
      */
     public IAxis[] getXAxes() {
-        return xAxisMap.values().toArray(new IAxis[0]);
+        Collection<Axis> values = xAxisMap.values();
+        return values.toArray(new IAxis[values.size()]);
     }
 
     /*
      * @see IAxisSet#getYAxes()
      */
     public IAxis[] getYAxes() {
-        return yAxisMap.values().toArray(new IAxis[0]);
+        Collection<Axis> values = yAxisMap.values();
+        return values.toArray(new IAxis[values.size()]);
     }
 
     /*
@@ -170,7 +172,7 @@ public class AxisSet implements IAxisSet {
         Collection<Axis> axes = new ArrayList<Axis>();
         axes.addAll(xAxisMap.values());
         axes.addAll(yAxisMap.values());
-        return axes.toArray(new Axis[0]);
+        return axes.toArray(new Axis[axes.size()]);
     }
 
     /*
@@ -189,14 +191,14 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Gets the axis ids for given direction.
-     * 
+     *
      * @param direction
      *            the direction
      * @return the axis ids
      */
     private int[] getAxisIds(Direction direction) {
-        Integer[] array = getAxisMap(direction).keySet()
-                .toArray(new Integer[0]);
+        Set<Integer> keySet = getAxisMap(direction).keySet();
+        Integer[] array = keySet.toArray(new Integer[keySet.size()]);
 
         int[] ids = new int[array.length];
         for (int i = 0; i < ids.length; i++) {
@@ -223,7 +225,7 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Deletes the axis with the axis id for given direction.
-     * 
+     *
      * @param id
      *            the axis id
      * @param direction
@@ -305,11 +307,11 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Updates the layout data
-     * 
+     *
      * @param axes
      *            The axes
      */
-    private void updateAxesLayoutData(IAxis[] axes) {
+    private static void updateAxesLayoutData(IAxis[] axes) {
         for (IAxis axis : axes) {
             ((Axis) axis).updateLayoutData();
         }
@@ -317,7 +319,7 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Updates the horizontal tick.
-     * 
+     *
      * @param horizontalAxes
      *            the horizontal axes
      * @param verticalAxes
@@ -354,7 +356,7 @@ public class AxisSet implements IAxisSet {
 
     /**
      * Updates the vertical tick.
-     * 
+     *
      * @param horizontalAxes
      *            the horizontal axes
      * @param verticalAxes

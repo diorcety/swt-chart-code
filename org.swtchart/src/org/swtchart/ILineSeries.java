@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -47,7 +47,7 @@ public interface ILineSeries extends ISeries {
 
         /**
          * Constructor.
-         * 
+         *
          * @param label
          *            plot symbol label
          */
@@ -58,7 +58,7 @@ public interface ILineSeries extends ISeries {
 
     /**
      * Gets the symbol type.
-     * 
+     *
      * @return the symbol type
      */
     PlotSymbolType getSymbolType();
@@ -66,7 +66,7 @@ public interface ILineSeries extends ISeries {
     /**
      * Sets the symbol type. If null is given, default type
      * <tt>PlotSymbolType.CIRCLE</tt> will be set.
-     * 
+     *
      * @param type
      *            the symbol type
      */
@@ -74,14 +74,14 @@ public interface ILineSeries extends ISeries {
 
     /**
      * Gets the symbol size in pixels.
-     * 
+     *
      * @return the symbol size
      */
     int getSymbolSize();
 
     /**
      * Sets the symbol size in pixels. The default size is 4.
-     * 
+     *
      * @param size
      *            the symbol size
      */
@@ -89,14 +89,14 @@ public interface ILineSeries extends ISeries {
 
     /**
      * Gets the symbol color.
-     * 
+     *
      * @return the symbol color
      */
     Color getSymbolColor();
 
     /**
      * Sets the symbol color. If null is given, default color will be set.
-     * 
+     *
      * @param color
      *            the symbol color
      */
@@ -104,37 +104,34 @@ public interface ILineSeries extends ISeries {
 
     /**
      * Gets the symbol colors.
-     * 
-     * @return the symbol colors, or <tt>null</tt> if no symbol colors are set.
+     *
+     * @return the symbol colors, or empty array if no symbol colors are set.
      */
     Color[] getSymbolColors();
 
     /**
-     * Sets the symbol colors. Typically, the number of symbol colors is the
-     * same as the number of plots. If the number of symbol colors is less than
-     * the number of plots, the rest of plots will have the common color which
-     * is set with <tt>setSymbolColor(Color)</tt>.
-     * 
-     * <p>
-     * By default, <tt>null</tt> is set.
-     * 
+     * Sets the symbol colors. Typically, the number of symbol colors is the same as the
+     * number of plots. If the number of symbol colors is less than the number of plots,
+     * the rest of plots will have the common color which is set with
+     * <tt>setSymbolColor(Color)</tt>.
+     *
      * @param colors
-     *            the symbol colors. If <tt>null</tt> is given, the color which
-     *            is set with <tt>setSymbolColor(Color)</tt> will be commonly
-     *            used for all plots.
+     *            the symbol colors. If <tt>null</tt> or empty array is given, the color
+     *            which is set with <tt>setSymbolColor(Color)</tt> will be commonly used
+     *            for all plots.
      */
     void setSymbolColors(Color[] colors);
 
     /**
      * Gets line style.
-     * 
+     *
      * @return line style.
      */
     LineStyle getLineStyle();
 
     /**
      * Sets line style. If null is given, default line style will be set.
-     * 
+     *
      * @param style
      *            line style
      */
@@ -142,14 +139,14 @@ public interface ILineSeries extends ISeries {
 
     /**
      * Gets the line color.
-     * 
+     *
      * @return the line color
      */
     Color getLineColor();
 
     /**
      * Sets line color. If null is given, default color will be set.
-     * 
+     *
      * @param color
      *            the line color
      */
@@ -157,7 +154,7 @@ public interface ILineSeries extends ISeries {
 
     /**
      * Gets the line width.
-     * 
+     *
      * @return the line width
      */
     int getLineWidth();
@@ -166,7 +163,7 @@ public interface ILineSeries extends ISeries {
      * Sets the width of line connecting data points and also line drawing
      * symbol if applicable (i.e. <tt>PlotSymbolType.CROSS</tt> or
      * <tt>PlotSymbolType.PLUS</tt>). The default width is 1.
-     * 
+     *
      * @param width
      *            the line width
      */
@@ -174,7 +171,7 @@ public interface ILineSeries extends ISeries {
 
     /**
      * Enables the area chart.
-     * 
+     *
      * @param enabled
      *            true if enabling area chart
      */
@@ -182,14 +179,14 @@ public interface ILineSeries extends ISeries {
 
     /**
      * Gets the state indicating if area chart is enabled.
-     * 
+     *
      * @return true if area chart is enabled
      */
     boolean isAreaEnabled();
 
     /**
      * Enables the step chart.
-     * 
+     *
      * @param enabled
      *            true if enabling step chart
      */
@@ -197,7 +194,7 @@ public interface ILineSeries extends ISeries {
 
     /**
      * Gets the state indicating if step chart is enabled.
-     * 
+     *
      * @return true if step chart is enabled
      */
     boolean isStepEnabled();
@@ -205,7 +202,7 @@ public interface ILineSeries extends ISeries {
     /**
      * Gets the anti-aliasing value for drawing line. The default value is
      * <tt>SWT.DEFAULT<tt>.
-     * 
+     *
      * @return the anti-aliasing value which can be <tt>SWT.DEFAULT</tt>,
      *         <tt>SWT.ON</tt> or <tt>SWT.OFF</tt>.
      */
@@ -220,7 +217,7 @@ public interface ILineSeries extends ISeries {
      * Therefore, client code may automatically enable/disable the anti-alias
      * for each series depending on the number of data points, or alternatively
      * may let end-user configure it.
-     * 
+     *
      * @param antialias
      *            the anti-aliasing value which can be <tt>SWT.DEFAULT</tt>,
      *            <tt>SWT.ON</tt> or <tt>SWT.OFF</tt>.

@@ -38,10 +38,10 @@ import org.swtchart.internal.Util;
 public class AxisTickLabels implements PaintListener {
 
     /** the chart */
-    private Chart chart;
+    private final Chart chart;
 
     /** the axis */
-    private Axis axis;
+    private final Axis axis;
 
     /** the foreground color */
     private Color foreground;
@@ -56,16 +56,16 @@ public class AxisTickLabels implements PaintListener {
     private Rectangle bounds;
 
     /** the array of tick label vales */
-    private ArrayList<Double> tickLabelValues;
+    private final ArrayList<Double> tickLabelValues;
 
     /** the array of tick label */
-    private ArrayList<String> tickLabels;
+    private final ArrayList<String> tickLabels;
 
     /** the array of tick label position in pixels */
-    private ArrayList<Integer> tickLabelPositions;
+    private final ArrayList<Integer> tickLabelPositions;
 
     /** the array of visibility state of tick label */
-    private ArrayList<Boolean> tickVisibilities;
+    private final ArrayList<Boolean> tickVisibilities;
 
     /** the maximum length of tick labels */
     private int tickLabelMaxLength;
@@ -94,7 +94,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Constructor.
-     *
+     * 
      * @param chart
      *            the chart
      * @param axis
@@ -141,7 +141,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Sets the foreground color.
-     *
+     * 
      * @param color
      *            the foreground color
      */
@@ -156,7 +156,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the foreground color.
-     *
+     * 
      * @return the foreground color
      */
     protected Color getForeground() {
@@ -169,7 +169,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates the tick labels.
-     *
+     * 
      * @param length
      *            the axis length
      */
@@ -194,7 +194,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for date axis.
-     *
+     * 
      * @param length
      *            the length of axis
      */
@@ -216,8 +216,8 @@ public class AxisTickLabels implements PaintListener {
             for (int i = 0; i < steps.length - 1; i++) {
                 if (gridStepHint < (getPeriodInMillis(timeUnit, steps[i]) + getPeriodInMillis(
                         timeUnit, steps[i + 1])) / 2d) {
-                    BigDecimal gridStep = new BigDecimal(Long.valueOf(
-                            getPeriodInMillis(timeUnit, steps[i])).toString());
+                    BigDecimal gridStep = BigDecimal.valueOf(getPeriodInMillis(
+                            timeUnit, steps[i]));
                     updateTickLabelForLinearScale(length, gridStep);
                     break;
                 }
@@ -232,7 +232,7 @@ public class AxisTickLabels implements PaintListener {
      * Updates the tick label for month or year. The month and year are handled
      * differently from other units of time, since 1 month and 1 year can be
      * different depending on which time to start counting.
-     *
+     * 
      * @param length
      *            the length of axis
      * @param gridStepHint
@@ -298,7 +298,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for category axis.
-     *
+     * 
      * @param length
      *            the length of axis
      */
@@ -325,7 +325,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for log scale.
-     *
+     * 
      * @param length
      *            the length of axis
      */
@@ -336,7 +336,7 @@ public class AxisTickLabels implements PaintListener {
         int digitMin = (int) Math.ceil(Math.log10(min));
         int digitMax = (int) Math.ceil(Math.log10(max));
 
-        final BigDecimal MIN = new BigDecimal(new Double(min).toString());
+        final BigDecimal MIN = BigDecimal.valueOf(min);
         BigDecimal tickStep = pow(10, digitMin - 1);
         BigDecimal firstPosition;
 
@@ -372,7 +372,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for normal scale.
-     *
+     * 
      * @param length
      *            axis length (>0)
      */
@@ -384,7 +384,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Updates tick label for normal scale.
-     *
+     * 
      * @param length
      *            axis length (>0)
      * @param tickStep
@@ -394,7 +394,7 @@ public class AxisTickLabels implements PaintListener {
         double min = axis.getRange().lower;
         double max = axis.getRange().upper;
 
-        final BigDecimal MIN = new BigDecimal(new Double(min).toString());
+        final BigDecimal MIN = BigDecimal.valueOf(min);
         BigDecimal firstPosition;
 
         /* if (min % tickStep <= 0) */
@@ -408,8 +408,8 @@ public class AxisTickLabels implements PaintListener {
 
         // the unit time starts from 1:00
         if (axis.isDateEnabled()) {
-            BigDecimal zeroOclock = firstPosition.subtract(new BigDecimal(
-                    new Double(3600000).toString()));
+            BigDecimal zeroOclock = firstPosition.subtract(BigDecimal
+                    .valueOf(3600000));
             if (MIN.compareTo(zeroOclock) == -1) {
                 firstPosition = zeroOclock;
             }
@@ -487,7 +487,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the tick step unit.
-     *
+     * 
      * @param gridStepHint
      *            the grid step hint
      * @return the tick step unit.
@@ -510,14 +510,14 @@ public class AxisTickLabels implements PaintListener {
     /**
      * Gets the period in milliseconds of given unit of date and amount. The
      * period is calculated based on UTC of January 1, 1970.
-     *
+     * 
      * @param unit
      *            the unit of time like <tt>Calendar.YEAR<tt>.
      * @param amount
      *            the amount of period.
      * @return the period in milliseconds
      */
-    private long getPeriodInMillis(int unit, int amount) {
+    private static long getPeriodInMillis(int unit, int amount) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(0);
         cal.roll(unit, amount);
@@ -526,7 +526,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Formats the given object.
-     *
+     * 
      * @param obj
      *            the object
      * @return the formatted string
@@ -559,7 +559,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Checks if the tick label is major (...,0.01,0.1,1,10,100,...).
-     *
+     * 
      * @param tickValue
      *            the tick label value
      * @return true if the tick label is major
@@ -578,7 +578,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Returns the state indicating if there is a space to draw tick label.
-     *
+     * 
      * @param previousPosition
      *            the previously drawn tick label position.
      * @param tickLabelPosition
@@ -622,27 +622,27 @@ public class AxisTickLabels implements PaintListener {
     /**
      * Calculates the value of the first argument raised to the power of the
      * second argument.
-     *
+     * 
      * @param base
      *            the base
-     * @param expornent
+     * @param exponent
      *            the exponent
      * @return the value <tt>a<sup>b</sup></tt> in <tt>BigDecimal</tt>
      */
-    private BigDecimal pow(double base, int expornent) {
+    private static BigDecimal pow(double base, int exponent) {
         BigDecimal value;
-        if (expornent > 0) {
-            value = new BigDecimal(new Double(base).toString()).pow(expornent);
+        if (exponent > 0) {
+            value = BigDecimal.valueOf(base).pow(exponent);
         } else {
-            value = BigDecimal.ONE.divide(new BigDecimal(new Double(base)
-                    .toString()).pow(-expornent));
+            value = BigDecimal.ONE.divide(BigDecimal.valueOf(base).pow(
+                    -exponent));
         }
         return value;
     }
 
     /**
      * Gets the grid step.
-     *
+     * 
      * @param lengthInPixels
      *            axis length in pixels
      * @param min
@@ -687,12 +687,10 @@ public class AxisTickLabels implements PaintListener {
             gridStep = BigDecimal.TEN.multiply(pow(10, exponent));
         } else if (mantissa > 3.5) {
             // gridStep = 5.0 * 10 ** exponent
-            gridStep = new BigDecimal(new Double(5).toString()).multiply(pow(
-                    10, exponent));
+            gridStep = BigDecimal.valueOf(5).multiply(pow(10, exponent));
         } else if (mantissa > 1.5) {
             // gridStep = 2.0 * 10 ** exponent
-            gridStep = new BigDecimal(new Double(2).toString()).multiply(pow(
-                    10, exponent));
+            gridStep = BigDecimal.valueOf(2).multiply(pow(10, exponent));
         } else {
             // gridStep = 1.0 * 10 ** exponent
             gridStep = pow(10, exponent);
@@ -702,7 +700,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the tick label positions.
-     *
+     * 
      * @return the tick label positions
      */
     public ArrayList<Integer> getTickLabelPositions() {
@@ -711,7 +709,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the tick label values.
-     *
+     * 
      * @return the tick label values
      */
     protected ArrayList<Double> getTickLabelValues() {
@@ -720,7 +718,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Sets the font.
-     *
+     * 
      * @param font
      *            the font
      */
@@ -734,7 +732,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the font.
-     *
+     * 
      * @return the font
      */
     protected Font getFont() {
@@ -746,7 +744,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the layout data.
-     *
+     * 
      * @return the layout data
      */
     public ChartLayoutData getLayoutData() {
@@ -755,7 +753,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Sets the bounds on chart panel.
-     *
+     * 
      * @param x
      *            the x coordinate
      * @param y
@@ -771,7 +769,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the bounds on chart panel.
-     *
+     * 
      * @return the bounds on chart panel
      */
     protected Rectangle getBounds() {
@@ -829,7 +827,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Draw the X tick.
-     *
+     * 
      * @param gc
      *            the graphics context
      */
@@ -870,7 +868,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Draws the rotated text.
-     *
+     * 
      * @param gc
      *            the graphics context
      * @param text
@@ -882,8 +880,7 @@ public class AxisTickLabels implements PaintListener {
      * @param angle
      *            the angle
      */
-    private void drawRotatedText(GC gc, String text, float x, float y,
-            int angle) {
+    private void drawRotatedText(GC gc, String text, float x, float y, int angle) {
 
         int textWidth = gc.textExtent(text).x;
         int textHeight = gc.textExtent(text).y;
@@ -914,7 +911,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Draw the Y tick.
-     *
+     * 
      * @param gc
      *            the graphics context
      */
@@ -948,7 +945,7 @@ public class AxisTickLabels implements PaintListener {
      * <tt>Data[]</tt> series respectively.
      * <p>
      * If <tt>null</tt> is set, default format will be used.
-     *
+     * 
      * @param format
      *            the format
      */
@@ -958,7 +955,7 @@ public class AxisTickLabels implements PaintListener {
 
     /**
      * Gets the format for axis tick label.
-     *
+     * 
      * @return the format
      */
     protected Format getFormat() {

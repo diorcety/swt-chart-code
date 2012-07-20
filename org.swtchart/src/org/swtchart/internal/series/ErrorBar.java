@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -60,6 +60,8 @@ public class ErrorBar implements IErrorBar {
         error = DEFAULT_ERROR;
         type = ErrorBarType.BOTH;
         isVisible = false;
+        plusErrors = new double[0];
+        minusErrors = new double[0];
     }
 
     /*
@@ -146,10 +148,6 @@ public class ErrorBar implements IErrorBar {
      * @see IErrorBar#getPlusErrors()
      */
     public double[] getPlusErrors() {
-        if (plusErrors == null) {
-            return null;
-        }
-
         double[] copiedSeries = new double[plusErrors.length];
         System.arraycopy(plusErrors, 0, copiedSeries, 0, plusErrors.length);
 
@@ -173,10 +171,6 @@ public class ErrorBar implements IErrorBar {
      * @see IErrorBar#getMinusErrors()
      */
     public double[] getMinusErrors() {
-        if (minusErrors == null) {
-            return null;
-        }
-
         double[] copiedSeries = new double[minusErrors.length];
         System.arraycopy(minusErrors, 0, copiedSeries, 0, minusErrors.length);
 
@@ -212,7 +206,7 @@ public class ErrorBar implements IErrorBar {
 
     /**
      * Draws error bar.
-     * 
+     *
      * @param gc
      *            the graphics context
      * @param h
@@ -237,10 +231,10 @@ public class ErrorBar implements IErrorBar {
         // get plus/minus error
         double plusError = error;
         double minusError = error;
-        if (plusErrors != null && plusErrors.length > seriesIndex) {
+        if (plusErrors.length > seriesIndex) {
             plusError = plusErrors[seriesIndex];
         }
-        if (minusErrors != null && minusErrors.length > seriesIndex) {
+        if (minusErrors.length > seriesIndex) {
             minusError = minusErrors[seriesIndex];
         }
 
@@ -252,7 +246,7 @@ public class ErrorBar implements IErrorBar {
 
     /**
      * Draws the error bar.
-     * 
+     *
      * @param gc
      *            the graphics context
      * @param h

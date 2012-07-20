@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -103,16 +103,15 @@ public interface ISeries {
     void setYSeries(double[] series);
 
     /**
-     * Gets the X series. If the X series is not set, <tt>null</tt> will be
-     * returned.
+     * Gets the X series. If the X series is not set, empty array will be returned.
      * 
      * @return the X series
      */
     double[] getXSeries();
 
     /**
-     * Gets the Y series. If the Y series haven't been set yet, <tt>null</tt>
-     * will be returned.
+     * Gets the Y series. If the Y series haven't been set yet, empty array will be
+     * returned.
      * 
      * @return the Y series
      */
@@ -121,8 +120,8 @@ public interface ISeries {
     /**
      * Sets the X date series.
      * <p>
-     * X series and X date series are exclusive. X date series will be cleared
-     * by setting X series, and vice versa.
+     * X series and X date series are exclusive. X date series will be cleared by setting
+     * X series, and vice versa.
      * 
      * @param series
      *            the X date series
@@ -132,7 +131,7 @@ public interface ISeries {
     /**
      * Gets the X date series.
      * 
-     * @return the X date series, or <tt>null</tt> if X date series is not set.
+     * @return the X date series, or empty array if X date series is not set.
      */
     Date[] getXDateSeries();
 
@@ -212,8 +211,8 @@ public interface ISeries {
     Point getPixelCoordinates(int index);
 
     /**
-     * Adds the dispose listener. The newly created color or font for series can
-     * be disposed with the dispose listener when they are no longer needed.
+     * Adds the dispose listener. The newly created color or font for series can be
+     * disposed with the dispose listener when they are no longer needed.
      * 
      * @param listener
      *            the dispose listener

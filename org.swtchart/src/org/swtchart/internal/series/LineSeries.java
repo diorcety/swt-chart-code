@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -11,10 +11,10 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Display;
 import org.swtchart.Chart;
+import org.swtchart.IAxis.Direction;
 import org.swtchart.ILineSeries;
 import org.swtchart.LineStyle;
 import org.swtchart.Range;
-import org.swtchart.IAxis.Direction;
 import org.swtchart.internal.Util;
 import org.swtchart.internal.axis.Axis;
 import org.swtchart.internal.compress.CompressLineSeries;
@@ -84,7 +84,7 @@ public class LineSeries extends Series implements ILineSeries {
 
     /**
      * Constructor.
-     * 
+     *
      * @param chart
      *            the chart
      * @param id
@@ -106,6 +106,7 @@ public class LineSeries extends Series implements ILineSeries {
         lineWidth = DEFAULT_LINE_WIDTH;
 
         compressor = new CompressLineSeries();
+        symbolColors = new Color[0];
     }
 
     /*
@@ -238,10 +239,6 @@ public class LineSeries extends Series implements ILineSeries {
      * @see ILineSeries#getSymbolColors()
      */
     public Color[] getSymbolColors() {
-        if (symbolColors == null) {
-            return null;
-        }
-
         Color[] copiedSymbolColors = new Color[symbolColors.length];
         System.arraycopy(symbolColors, 0, copiedSymbolColors, 0,
                 symbolColors.length);
@@ -254,7 +251,7 @@ public class LineSeries extends Series implements ILineSeries {
      */
     public void setSymbolColors(Color[] colors) {
         if (colors == null) {
-            symbolColors = null;
+            symbolColors = new Color[0];
             return;
         }
 
@@ -350,7 +347,7 @@ public class LineSeries extends Series implements ILineSeries {
 
     /**
      * Gets the line points to draw line and area.
-     * 
+     *
      * @param xseries
      *            the horizontal series
      * @param yseries
@@ -429,7 +426,7 @@ public class LineSeries extends Series implements ILineSeries {
 
     /**
      * Draws the line and area.
-     * 
+     *
      * @param gc
      *            the graphics context
      * @param width
@@ -512,7 +509,7 @@ public class LineSeries extends Series implements ILineSeries {
 
     /**
      * Draws the area.
-     * 
+     *
      * @param gc
      *            the graphic context
      * @param p
@@ -545,7 +542,7 @@ public class LineSeries extends Series implements ILineSeries {
 
     /**
      * Draws series symbol, label and error bars.
-     * 
+     *
      * @param gc
      *            the graphics context
      * @param width
@@ -577,7 +574,7 @@ public class LineSeries extends Series implements ILineSeries {
         // draw symbol and label
         for (int i = 0; i < xseries.length; i++) {
             Color color;
-            if (symbolColors != null && symbolColors.length > indexes[i]) {
+            if (symbolColors.length > indexes[i]) {
                 color = symbolColors[indexes[i]];
             } else {
                 color = getSymbolColor();
@@ -601,7 +598,7 @@ public class LineSeries extends Series implements ILineSeries {
 
     /**
      * Draws series symbol.
-     * 
+     *
      * @param gc
      *            the GC object
      * @param h

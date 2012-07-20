@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -55,6 +55,7 @@ public class SeriesLabel implements ISeriesLabel {
         color = Display.getDefault().getSystemColor(DEFAULT_COLOR);
         isVisible = false;
         format = DEFAULT_FORMAT;
+        formats = new String[0];
     }
 
     /*
@@ -79,10 +80,6 @@ public class SeriesLabel implements ISeriesLabel {
      * @see ISeriesLabel#getFormats()
      */
     public String[] getFormats() {
-        if (formats == null) {
-            return null;
-        }
-
         String[] copiedFormats = new String[formats.length];
         System.arraycopy(formats, 0, copiedFormats, 0, formats.length);
 
@@ -94,7 +91,7 @@ public class SeriesLabel implements ISeriesLabel {
      */
     public void setFormats(String[] formats) {
         if (formats == null) {
-            this.formats = null;
+            this.formats = new String[0];
             return;
         }
 
@@ -164,7 +161,7 @@ public class SeriesLabel implements ISeriesLabel {
 
     /**
      * Draws series label.
-     * 
+     *
      * @param gc
      *            the GC object
      * @param h
@@ -189,7 +186,7 @@ public class SeriesLabel implements ISeriesLabel {
 
         // get format
         String format1 = format;
-        if (formats != null && formats.length > seriesIndex) {
+        if (formats.length > seriesIndex) {
             format1 = formats[seriesIndex];
         }
         if (format1 == null || format1.equals("")) {
@@ -216,12 +213,12 @@ public class SeriesLabel implements ISeriesLabel {
 
     /**
      * Gets the state indicating if decimal format is given.
-     * 
+     *
      * @param text
      *            the text to be checked
      * @return true if decimal format is given
      */
-    private boolean isDecimalFormat(String text) {
+    private static boolean isDecimalFormat(String text) {
         StringBuilder nonEscapedPart = new StringBuilder();
         String[] elements = text.split("'");
         if (elements != null) {

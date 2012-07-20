@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -8,18 +8,18 @@ package org.swtchart.internal.series;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
+import org.swtchart.IAxis.Direction;
 import org.swtchart.ISeries;
+import org.swtchart.ISeries.SeriesType;
 import org.swtchart.ISeriesSet;
 import org.swtchart.Range;
-import org.swtchart.IAxis.Direction;
-import org.swtchart.ISeries.SeriesType;
 import org.swtchart.internal.axis.Axis;
 import org.swtchart.internal.compress.CompressConfig;
 import org.swtchart.internal.compress.ICompress;
@@ -30,7 +30,7 @@ import org.swtchart.internal.compress.ICompress;
 public class SeriesSet implements ISeriesSet {
 
     /** the chart */
-    private Chart chart;
+    private final Chart chart;
 
     /** the series */
     private LinkedHashMap<String, Series> seriesMap;
@@ -423,7 +423,7 @@ public class SeriesSet implements ISeriesSet {
      * @param series
      *            the series
      */
-    private void setStackSeries(double[] stackSeries, ISeries series) {
+    private static void setStackSeries(double[] stackSeries, ISeries series) {
         double[] ySeries = series.getYSeries();
         if (ySeries == null || stackSeries == null) {
             return;
@@ -433,10 +433,8 @@ public class SeriesSet implements ISeriesSet {
             if (i > ySeries.length) {
                 break;
             }
-            stackSeries[i] = new BigDecimal(new Double(stackSeries[i])
-                    .toString()).add(
-                    new BigDecimal(new Double(ySeries[i]).toString()))
-                    .doubleValue();
+            stackSeries[i] = BigDecimal.valueOf(stackSeries[i])
+                    .add(BigDecimal.valueOf(ySeries[i])).doubleValue();
         }
         double[] copiedStackSeries = new double[stackSeries.length];
         System.arraycopy(stackSeries, 0, copiedStackSeries, 0,

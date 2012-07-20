@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
- * 
+ * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
@@ -21,7 +21,7 @@ public interface ISeriesLabel {
      * set with this method will be ignored.
      * <p>
      * If null is given, default format "#.###########" will be set.
-     * 
+     *
      * @param format
      *            the format
      */
@@ -29,16 +29,16 @@ public interface ISeriesLabel {
 
     /**
      * Gets the format for label.
-     * 
+     *
      * @return the format
      */
     String getFormat();
 
     /**
-     * Sets the formats for all data points. If null is given, formats will be
-     * cleared, and the format set with <tt>setFormat(String)</tt> will be used
+     * Sets the formats for all data points. If null or empty array is given, formats will
+     * be cleared, and the format set with <tt>setFormat(String)</tt> will be used
      * instead.
-     * 
+     *
      * @param formats
      *            the formats
      */
@@ -46,14 +46,14 @@ public interface ISeriesLabel {
 
     /**
      * Gets the formats for all data points.
-     * 
-     * @return the formats
+     *
+     * @return the formats, or empty array if not set
      */
     String[] getFormats();
 
     /**
      * Sets the label color. If null is given, default color will be set.
-     * 
+     *
      * @param color
      *            the label color
      */
@@ -61,14 +61,14 @@ public interface ISeriesLabel {
 
     /**
      * Gets the label color.
-     * 
+     *
      * @return the label color
      */
     Color getForeground();
 
     /**
      * Sets the label font.
-     * 
+     *
      * @param font
      *            the label font
      */
@@ -76,14 +76,14 @@ public interface ISeriesLabel {
 
     /**
      * Gets the label font.
-     * 
+     *
      * @return the label font
      */
     Font getFont();
 
     /**
      * Sets the label visibility state.
-     * 
+     *
      * @param visible
      *            the label visibility state
      */
@@ -91,7 +91,7 @@ public interface ISeriesLabel {
 
     /**
      * Gets the label visibility state.
-     * 
+     *
      * @return true if label is visible
      */
     boolean isVisible();
