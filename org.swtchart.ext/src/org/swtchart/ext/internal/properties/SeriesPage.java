@@ -20,13 +20,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 import org.swtchart.IBarSeries;
 import org.swtchart.IDisposeListener;
 import org.swtchart.ILineSeries;
+import org.swtchart.ILineSeries.PlotSymbolType;
 import org.swtchart.ISeries;
 import org.swtchart.LineStyle;
-import org.swtchart.ILineSeries.PlotSymbolType;
 import org.swtchart.ext.InteractiveChart;
 
 /**
@@ -408,7 +407,6 @@ public class SeriesPage extends AbstractSelectorPage {
      */
     private void addBarSeriesGroup(Composite parent) {
         barSeriesGroup = new Composite(parent, SWT.NONE);
-        new Text(parent, SWT.NONE);
         barSeriesGroup.setLayout(new GridLayout(1, true));
         barSeriesGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
