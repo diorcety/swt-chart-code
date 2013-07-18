@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved. 
+ * Copyright (c) 2008-2013 SWTChart project. All rights reserved. 
  * 
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
@@ -15,6 +15,52 @@ import org.eclipse.swt.graphics.Rectangle;
 public interface IBarSeries extends ISeries {
 
     /**
+     * Bar width style.
+     */
+    public enum BarWidthStyle {
+
+        /** the style stretching the bar width depending on interval of bars. */
+        STRETCHED,
+
+        /** the style fixing the bar width regardless of interval of bars. */
+        FIXED;
+    }
+
+    /**
+     * Gets the bar width style.
+     * 
+     * @param style
+     *            the bar width style
+     * @return the bar width style
+     */
+    BarWidthStyle getBarWidthStyle(BarWidthStyle style);
+
+    /**
+     * Sets the bar width style. The default is <tt>BarWidthStyle.STRETCHED</tt>
+     * .
+     * 
+     * @param style
+     *            the bar width style
+     */
+    void setBarWidthStyle(BarWidthStyle style);
+
+    /**
+     * Gets the bar width in pixels.
+     * 
+     * @return the bar width in pixels
+     */
+    int getBarWidth();
+
+    /**
+     * Sets the bar width in pixels. The specified bar width is active only when
+     * the bar width style is set to <tt>BarWidthStyle.FIXED</tt>.
+     * 
+     * @param width
+     *            the bar width in pixels
+     */
+    void setBarWidth(int width);
+
+    /**
      * Gets the bar padding in percentage.
      * 
      * @return the bar padding in percentage
@@ -22,7 +68,8 @@ public interface IBarSeries extends ISeries {
     int getBarPadding();
 
     /**
-     * Sets the bar padding in percentage.
+     * Sets the bar padding in percentage. The specified padding is active only
+     * when the bar width style is set to <tt>BarWidthStyle.STRETCHED</tt>.
      * 
      * @param padding
      *            the bar padding in percentage

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 SWTChart project. All rights reserved.
+ * Copyright (c) 2008-2013 SWTChart project. All rights reserved.
  *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
@@ -31,8 +31,17 @@ public class BarSeries extends Series implements IBarSeries {
     /** the riser color */
     private Color barColor;
 
+    /** the bar width */
+    private int barWidth;
+
     /** the padding */
     private int padding;
+
+    /** the bar width style */
+    private BarWidthStyle barWidthStyle;
+
+    /** the initial bar width in pixels */
+    public static final int INITIAL_BAR_WIDTH = 20;
 
     /** the initial bar padding in percentage */
     public static final int INITIAL_PADDING = 20;
@@ -58,10 +67,43 @@ public class BarSeries extends Series implements IBarSeries {
         super(chart, id);
 
         barColor = Display.getDefault().getSystemColor(DEFAULT_BAR_COLOR);
+        barWidthStyle = BarWidthStyle.STRETCHED;
+        barWidth = INITIAL_PADDING;
         padding = INITIAL_PADDING;
         type = SeriesType.BAR;
 
         compressor = new CompressBarSeries();
+    }
+
+    /*
+     * @see IBarSeries#getBarWidthStyle(BarWidthStyle)
+     */
+    public BarWidthStyle getBarWidthStyle(BarWidthStyle style) {
+        return barWidthStyle;
+    }
+
+    /*
+     * @see IBarSeries#setBarWidthStyle(BarWidthStyle)
+     */
+    public void setBarWidthStyle(BarWidthStyle style) {
+        this.barWidthStyle = style;
+    }
+
+    /*
+     * @see IBarSeries#getBarWidth()
+     */
+    public int getBarWidth() {
+        return barWidth;
+    }
+
+    /*
+     * @see IBarSeries#setBarWidth(int)
+     */
+    public void setBarWidth(int width) {
+        if (padding <= 0) {
+            SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+        }
+        this.barWidth = width;
     }
 
     /*
@@ -346,19 +388,26 @@ public class BarSeries extends Series implements IBarSeries {
             lower = series[index - 1];
         }
 
-        // get riser width without padding
-        int width = Math.abs(xAxis.getPixelCoordinate(upper, min, max)
-                - xAxis.getPixelCoordinate(lower, min, max));
+        if (barWidthStyle == BarWidthStyle.STRETCHED) {
+            
+            // get riser width without padding
+            int width = Math.abs(xAxis.getPixelCoordinate(upper, min, max)
+                    - xAxis.getPixelCoordinate(lower, min, max));
 
-        // adjust for padding
-        width *= (100 - padding) / 100d;
+            // adjust for padding
+            width *= (100 - padding) / 100d;
 
-        // symbol size should be at least more than 1
-        if (width == 0) {
-            width = 1;
+            // symbol size should be at least more than 1
+            if (width == 0) {
+                width = 1;
+            }
+
+            return width;
+        } else if (barWidthStyle == BarWidthStyle.FIXED) {
+            return barWidth;
         }
 
-        return width;
+        throw new IllegalStateException("unknown bar width style");
     }
 
     /**
