@@ -267,25 +267,20 @@ public class Axis implements IAxis {
         }
 
         if (enabled) {
-            if (chart.getSeriesSet().getSeries().length == 0) {
-                if (min <= 0) {
-                    min = DEFAULT_LOG_SCALE_MIN;
-                }
-                if (max < min) {
-                    max = DEFAULT_LOG_SCALE_MAX;
-                }
-            } else {
-                // check if series contain negative value
-                double minSeriesValue = getMinSeriesValue();
-                if (enabled && minSeriesValue <= 0) {
-                    throw new IllegalStateException(
-                            "Series contain negative value.");
-                }
+            // check if series contain zero or negative value
+            double minSeriesValue = getMinSeriesValue();
+            if (minSeriesValue <= 0) {
+                throw new IllegalStateException(
+                        "Series contain zero or negative value.");
+            }
 
-                // adjust the range in order not to have negative value
-                if (min <= 0) {
-                    min = minSeriesValue;
-                }
+            // adjust the range in order not to have zero or negative value
+            if (min <= 0) {
+                min = Double.isNaN(minSeriesValue) ? DEFAULT_LOG_SCALE_MIN
+                        : minSeriesValue;
+            }
+            if (max < min) {
+                max = DEFAULT_LOG_SCALE_MAX;
             }
 
             // disable category axis
@@ -307,6 +302,10 @@ public class Axis implements IAxis {
     private double getMinSeriesValue() {
         double minimum = Double.NaN;
         for (ISeries series : chart.getSeriesSet().getSeries()) {
+            if (series.getYSeries().length == 0) {
+                continue;
+            }
+
             double lower;
             if (direction == Direction.X && series.getXAxisId() == getId()) {
                 lower = ((Series) series).getXRange().lower;
