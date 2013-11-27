@@ -430,7 +430,7 @@ public class SeriesSet implements ISeriesSet {
         }
 
         for (int i = 0; i < stackSeries.length; i++) {
-            if (i > ySeries.length) {
+            if (i >= ySeries.length) {
                 break;
             }
             stackSeries[i] = BigDecimal.valueOf(stackSeries[i])
