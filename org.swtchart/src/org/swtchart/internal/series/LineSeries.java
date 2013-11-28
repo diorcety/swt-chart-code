@@ -373,27 +373,27 @@ public class LineSeries extends Series implements ILineSeries {
         int y2 = yAxis.getPixelCoordinate(yseries[index + 1]);
         int y3, y4;
 
-                double baseYCoordinate = yAxis.getRange().lower > 0 ? yAxis.getRange().lower
-                                : 0;
+        double baseYCoordinate = yAxis.getRange().lower > 0 ? yAxis.getRange().lower
+                : 0;
 
-                if (yAxis.isLogScaleEnabled()) {
-                        y3 = yAxis.getPixelCoordinate(yAxis.getRange().lower);
-                        y4 = y3;
-                } else if (isValidStackSeries()) {
-                        y1 = yAxis.getPixelCoordinate(stackSeries[indexes[index]]);
-                        y2 = yAxis.getPixelCoordinate(stackSeries[indexes[index + 1]]);
-                        y3 = yAxis.getPixelCoordinate(stackSeries[indexes[index + 1]])
-                                        + Math.abs(yAxis.getPixelCoordinate(yseries[index + 1])
-                                                        - yAxis.getPixelCoordinate(0))
-                                        * (xAxis.isHorizontalAxis() ? 1 : -1);
-                        y4 = yAxis.getPixelCoordinate(stackSeries[indexes[index]])
-                                        + Math.abs(yAxis.getPixelCoordinate(yseries[index])
-                                                        - yAxis.getPixelCoordinate(0))
-                                        * (xAxis.isHorizontalAxis() ? 1 : -1);
-                } else {
-                        y3 = yAxis.getPixelCoordinate(baseYCoordinate);
-                        y4 = y3;
-                }
+        if (yAxis.isLogScaleEnabled()) {
+            y3 = yAxis.getPixelCoordinate(yAxis.getRange().lower);
+            y4 = y3;
+        } else if (isValidStackSeries()) {
+            y1 = yAxis.getPixelCoordinate(stackSeries[indexes[index]]);
+            y2 = yAxis.getPixelCoordinate(stackSeries[indexes[index + 1]]);
+            y3 = yAxis.getPixelCoordinate(stackSeries[indexes[index + 1]])
+                    + Math.abs(yAxis.getPixelCoordinate(yseries[index + 1])
+                            - yAxis.getPixelCoordinate(0))
+                    * (xAxis.isHorizontalAxis() ? 1 : -1);
+            y4 = yAxis.getPixelCoordinate(stackSeries[indexes[index]])
+                    + Math.abs(yAxis.getPixelCoordinate(yseries[index])
+                            - yAxis.getPixelCoordinate(0))
+                    * (xAxis.isHorizontalAxis() ? 1 : -1);
+        } else {
+            y3 = yAxis.getPixelCoordinate(baseYCoordinate);
+            y4 = y3;
+        }
 
         if (xAxis.isHorizontalAxis()) {
             return new int[] { x1, y1, x2, y2, x3, y3, x4, y4 };
@@ -484,26 +484,87 @@ public class LineSeries extends Series implements ILineSeries {
                 }
             }
         } else {
-            double xLower = xAxis.getRange().lower;
-            double xUpper = xAxis.getRange().upper;
-            double yLower = yAxis.getRange().lower;
-            double yUpper = yAxis.getRange().upper;
+            drawLine(gc, xAxis, yAxis, xseries, yseries, isHorizontal);
+        }
+    }
 
-            int prevX = xAxis.getPixelCoordinate(xseries[0], xLower, xUpper);
-            int prevY = yAxis.getPixelCoordinate(yseries[0], yLower, yUpper);
-            for (int i = 0; i < xseries.length - 1; i++) {
-                int x = xAxis
-                        .getPixelCoordinate(xseries[i + 1], xLower, xUpper);
-                int y = yAxis
-                        .getPixelCoordinate(yseries[i + 1], yLower, yUpper);
+    /**
+     * Draws the line segments.
+     * <p>
+     * When there are multiple data points at the same x pixel coordinate, it is
+     * inefficient to simply draw vertical lines connecting them by overlaying.
+     * Instead, only a single vertical line representing the overlaid multiple
+     * vertical lines is drawn at that x pixel coordinate.
+     * <p>
+     * That's why vertical line is handled differently from non-vertical line in
+     * this method.
+     * 
+     * @param gc
+     *            the graphic context
+     * @param xAxis
+     *            the x axis
+     * @param yAxis
+     *            the y axis
+     * @param xseries
+     *            the x series
+     * @param yseries
+     *            the y series
+     * @param isHorizontal
+     *            true if orientation is horizontal
+     */
+    private void drawLine(GC gc, Axis xAxis, Axis yAxis, double[] xseries,
+            double[] yseries, boolean isHorizontal) {
+        double xLower = xAxis.getRange().lower;
+        double xUpper = xAxis.getRange().upper;
+        double yLower = yAxis.getRange().lower;
+        double yUpper = yAxis.getRange().upper;
+
+        int prevX = xAxis.getPixelCoordinate(xseries[0], xLower, xUpper);
+        int prevY = yAxis.getPixelCoordinate(yseries[0], yLower, yUpper);
+
+        boolean drawVerticalLine = false;
+        int verticalLineYLower = 0;
+        int verticalLineYUpper = 0;
+
+        for (int i = 0; i < xseries.length - 1; i++) {
+            int x = xAxis.getPixelCoordinate(xseries[i + 1], xLower, xUpper);
+            int y = yAxis.getPixelCoordinate(yseries[i + 1], yLower, yUpper);
+
+            if (x == prevX && i < xseries.length - 2) {
+                if (drawVerticalLine) {
+                    // extend vertical line
+                    verticalLineYLower = Math.min(verticalLineYLower, y);
+                    verticalLineYUpper = Math.max(verticalLineYUpper, y);
+                } else {
+                    // init vertical line
+                    verticalLineYLower = Math.min(prevY, y);
+                    verticalLineYUpper = Math.max(prevY, y);
+                    drawVerticalLine = true;
+                }
+            } else {
+
+                // draw vertical line
+                if (drawVerticalLine) {
+                    if (isHorizontal) {
+                        gc.drawLine(prevX, verticalLineYLower, prevX,
+                                verticalLineYUpper);
+                    } else {
+                        gc.drawLine(verticalLineYLower, prevX,
+                                verticalLineYUpper, prevX);
+                    }
+                    drawVerticalLine = false;
+                }
+
+                // draw non-vertical line
                 if (isHorizontal) {
                     gc.drawLine(prevX, prevY, x, y);
                 } else {
                     gc.drawLine(prevY, prevX, y, x);
                 }
-                prevX = x;
-                prevY = y;
             }
+
+            prevX = x;
+            prevY = y;
         }
     }
 
