@@ -22,7 +22,6 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
@@ -882,30 +881,15 @@ public class AxisTickLabels implements PaintListener {
      */
     private void drawRotatedText(GC gc, String text, float x, float y, int angle) {
 
-        int textWidth = gc.textExtent(text).x;
-        int textHeight = gc.textExtent(text).y;
-
-        // create image to draw text
-        Image image = new Image(Display.getCurrent(), textWidth, textHeight);
-        GC tmpGc = new GC(image);
-        tmpGc.setForeground(getForeground());
-        tmpGc.setBackground(gc.getBackground());
-        tmpGc.setFont(getFont());
-        tmpGc.drawText(text, 0, 0);
-
         // set transform to rotate
         Transform transform = new Transform(gc.getDevice());
         transform.translate(x, y);
         transform.rotate(360 - angle);
         gc.setTransform(transform);
+        gc.drawText(text, 0, 0);
 
-        // draw the image on the rotated graphics context
-        gc.drawImage(image, 0, 0);
-
-        // dispose resources
-        tmpGc.dispose();
+        // clear transform
         transform.dispose();
-        image.dispose();
         gc.setTransform(null);
     }
 
