@@ -15,13 +15,9 @@ import java.util.Set;
 import org.eclipse.swt.SWT;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
+import org.swtchart.IAxis.Direction;
 import org.swtchart.IAxisSet;
 import org.swtchart.ISeries;
-import org.swtchart.IAxis.Direction;
-import org.swtchart.internal.ChartLayout;
-import org.swtchart.internal.ChartLayoutData;
-import org.swtchart.internal.Legend;
-import org.swtchart.internal.Title;
 import org.swtchart.internal.series.SeriesSet;
 
 /**
@@ -154,7 +150,7 @@ public class AxisSet implements IAxisSet {
      */
     public IAxis[] getXAxes() {
         Collection<Axis> values = xAxisMap.values();
-        return values.toArray(new IAxis[values.size()]);
+        return values.toArray(new Axis[values.size()]);
     }
 
     /*
@@ -162,7 +158,7 @@ public class AxisSet implements IAxisSet {
      */
     public IAxis[] getYAxes() {
         Collection<Axis> values = yAxisMap.values();
-        return values.toArray(new IAxis[values.size()]);
+        return values.toArray(new Axis[values.size()]);
     }
 
     /*
@@ -289,108 +285,8 @@ public class AxisSet implements IAxisSet {
      * Updates the layout data.
      */
     public void updateLayoutData() {
-        IAxis[] horizontalAxes;
-        IAxis[] verticalAxes;
-        if (chart.getOrientation() == SWT.HORIZONTAL) {
-            horizontalAxes = getXAxes();
-            verticalAxes = getYAxes();
-        } else {
-            horizontalAxes = getYAxes();
-            verticalAxes = getXAxes();
-        }
-
-        updateAxesLayoutData(horizontalAxes);
-        updateVerticalTick(horizontalAxes, verticalAxes);
-        updateAxesLayoutData(verticalAxes);
-        updateHorizontalTick(horizontalAxes, verticalAxes);
-    }
-
-    /**
-     * Updates the layout data
-     *
-     * @param axes
-     *            The axes
-     */
-    private static void updateAxesLayoutData(IAxis[] axes) {
-        for (IAxis axis : axes) {
+        for (IAxis axis : getAxes()) {
             ((Axis) axis).updateLayoutData();
-        }
-    }
-
-    /**
-     * Updates the horizontal tick.
-     *
-     * @param horizontalAxes
-     *            the horizontal axes
-     * @param verticalAxes
-     *            the vertical axes
-     */
-    private void updateHorizontalTick(IAxis[] horizontalAxes,
-            IAxis[] verticalAxes) {
-        int legendPosition = ((Legend) chart.getLegend()).getPosition();
-        int legendWidth = ((ChartLayoutData) ((Legend) chart.getLegend())
-                .getLayoutData()).widthHint;
-        int axesWidth = 0;
-
-        for (IAxis axis : verticalAxes) {
-            axesWidth += ((ChartLayoutData) ((Title) ((Axis) axis).getTitle())
-                    .getLayoutData()).widthHint
-                    + ((Axis) axis).getTick().getAxisTickLabels()
-                            .getLayoutData().widthHint
-                    + ((Axis) axis).getTick().getAxisTickMarks()
-                            .getLayoutData().widthHint;
-        }
-
-        int axisWidth = chart.getClientArea().width
-                - axesWidth
-                - ChartLayout.MARGIN
-                * 2
-                - (legendPosition == SWT.LEFT || legendPosition == SWT.RIGHT ? legendWidth
-                        + (legendWidth == 0 ? 0 : ChartLayout.PADDING)
-                        : 0);
-
-        for (IAxis axis : horizontalAxes) {
-            ((Axis) axis).getTick().updateTick(axisWidth);
-        }
-    }
-
-    /**
-     * Updates the vertical tick.
-     *
-     * @param horizontalAxes
-     *            the horizontal axes
-     * @param verticalAxes
-     *            the vertical axes
-     */
-    private void updateVerticalTick(IAxis[] horizontalAxes, IAxis[] verticalAxes) {
-        int legendPosition = ((Legend) chart.getLegend()).getPosition();
-        int legendHeight = ((ChartLayoutData) ((Legend) chart.getLegend())
-                .getLayoutData()).heightHint;
-        int titleHeight = ((ChartLayoutData) ((Title) chart.getTitle())
-                .getLayoutData()).heightHint;
-        int axesHeight = 0;
-
-        for (IAxis axis : horizontalAxes) {
-            axesHeight += ((ChartLayoutData) ((Title) ((Axis) axis).getTitle())
-                    .getLayoutData()).heightHint
-                    + ((Axis) axis).getTick().getAxisTickLabels()
-                            .getLayoutData().heightHint
-                    + ((Axis) axis).getTick().getAxisTickMarks()
-                            .getLayoutData().heightHint;
-        }
-
-        int axisHeight = chart.getClientArea().height
-                - titleHeight
-                - axesHeight
-                - ChartLayout.MARGIN
-                * 2
-                - (titleHeight == 0 ? 0 : ChartLayout.PADDING)
-                - ((legendPosition == SWT.TOP || legendPosition == SWT.BOTTOM) ? legendHeight
-                        + (legendHeight == 0 ? 0 : ChartLayout.PADDING)
-                        : 0);
-
-        for (IAxis axis : verticalAxes) {
-            ((Axis) axis).getTick().updateTick(axisHeight);
         }
     }
 

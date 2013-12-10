@@ -230,7 +230,7 @@ public class AxisTick implements IAxisTick {
      * @param length
      *            the axis length
      */
-    protected void updateTick(int length) {
+    public void updateTick(int length) {
         if (length <= 0) {
             axisTickLabels.update(1);
         } else {

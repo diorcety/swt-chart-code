@@ -66,9 +66,6 @@ public class AxisTickLabels implements PaintListener {
     /** the array of visibility state of tick label */
     private final ArrayList<Boolean> tickVisibilities;
 
-    /** the maximum length of tick labels */
-    private int tickLabelMaxLength;
-
     /** the format for tick labels */
     private Format format;
 
@@ -188,7 +185,6 @@ public class AxisTickLabels implements PaintListener {
         }
 
         updateTickVisibility();
-        updateTickLabelMaxLength();
     }
 
     /**
@@ -591,14 +587,91 @@ public class AxisTickLabels implements PaintListener {
         Point p = Util.getExtentInGC(axis.getTick().getFont(), tickLabel);
         int interval = tickLabelPosition - previousPosition;
         int textLength = axis.isHorizontalAxis() ? p.x : p.y;
+        int padding = 3;
 
-        return interval > textLength;
+        return interval > textLength + padding;
     }
 
     /**
-     * Gets max length of tick label.
+     * Gets the right margin hint.
+     * 
+     * @param length
+     *            the axis length
+     * @return the right margin hint
      */
-    private void updateTickLabelMaxLength() {
+    public int getRightMarginHint(int length) {
+
+        // search the most right tick label
+        int mostRightLabelIndex = -1;
+        for (int i = tickLabels.size() - 1; i >= 0; i--) {
+            if (tickVisibilities.size() > i && tickVisibilities.get(i)) {
+                mostRightLabelIndex = i;
+                break;
+            }
+        }
+
+        // calculate right margin hint
+        int rightMarginHint = 0;
+        if (mostRightLabelIndex != -1) {
+            int position = tickLabelPositions.get(mostRightLabelIndex);
+            double angle = axis.getTick().getTickLabelAngle();
+            int textWidth = Util.getExtentInGC(axis.getTick().getFont(),
+                    tickLabels.get(mostRightLabelIndex)).x;
+            if (angle == 0) {
+                rightMarginHint = Math.max(0, position - length
+                        + (int) (textWidth / 2d));
+            } else if (axis.getPosition() == Position.Secondary) {
+                rightMarginHint = Math.max(0, position  - length
+                        + (int) (textWidth * Math.cos(Math.toRadians(angle))));
+            }
+        }
+
+        return rightMarginHint;
+    }
+
+    /**
+     * Updates the left margin hint.
+     * 
+     * @param length
+     *            the axis length
+     * @return the left margin hint
+     */
+    public int getLeftMarginHint(int length) {
+
+        // search the most left tick label
+        int mostLeftLabelIndex = -1;
+        for (int i = 0; i < tickLabels.size(); i++) {
+            if (tickVisibilities.size() > i && tickVisibilities.get(i)) {
+                mostLeftLabelIndex = i;
+                break;
+            }
+        }
+
+        // calculate left margin hint
+        int leftMarginHint = 0;
+        if (mostLeftLabelIndex != -1) {
+            int position = tickLabelPositions.get(mostLeftLabelIndex);
+            double angle = axis.getTick().getTickLabelAngle();
+            int textWidth = Util.getExtentInGC(axis.getTick().getFont(),
+                    tickLabels.get(mostLeftLabelIndex)).x;
+            if (angle == 0) {
+                leftMarginHint = Math.max(0, (int) (textWidth / 2d) - position);
+            } else if (axis.getPosition() == Position.Primary) {
+                leftMarginHint = Math.max(0,
+                        (int) (textWidth * Math.cos(Math.toRadians(angle)))
+                                - position);
+            }
+        }
+
+        return leftMarginHint;
+    }
+
+    /**
+     * Gets the max length of tick label.
+     * 
+     * @return the max length of tick label
+     */
+    public int getTickLabelMaxLength() {
         int maxLength = 0;
         for (int i = 0; i < tickLabels.size(); i++) {
             if (tickVisibilities.size() > i && tickVisibilities.get(i) == true) {
@@ -610,12 +683,7 @@ public class AxisTickLabels implements PaintListener {
             }
         }
 
-        if (tickLabelMaxLength != maxLength) {
-            tickLabelMaxLength = maxLength;
-            if (axis.getTick().getTickLabelAngle() != 0) {
-                chart.updateLayout();
-            }
-        }
+        return maxLength;
     }
 
     /**
@@ -734,7 +802,7 @@ public class AxisTickLabels implements PaintListener {
      * 
      * @return the font
      */
-    protected Font getFont() {
+    public Font getFont() {
         if (font.isDisposed()) {
             font = DEFAULT_FONT;
         }
@@ -795,14 +863,10 @@ public class AxisTickLabels implements PaintListener {
             heightHint = 0;
         } else {
             if (axis.isHorizontalAxis()) {
-                double angle = axis.getTick().getTickLabelAngle();
                 heightHint = Axis.MARGIN
-                        + (int) (tickLabelMaxLength
-                                * Math.sin(Math.toRadians(angle)) + Util
-                                .getExtentInGC(getFont(), "dummy").y
-                                * Math.cos(Math.toRadians(angle)));
+                        + Util.getExtentInGC(getFont(), "dummy").y;
             } else {
-                widthHint = tickLabelMaxLength + Axis.MARGIN;
+                widthHint = Axis.MARGIN;
             }
         }
     }
@@ -857,7 +921,7 @@ public class AxisTickLabels implements PaintListener {
                 } else {
                     x = (float) (offset + bounds.x + tickLabelPositions.get(i) - textHeight
                             / 2d * Math.sin(Math.toRadians(angle)));
-                    y = (float) (bounds.y + tickLabelMaxLength
+                    y = (float) (bounds.y + bounds.height
                             * Math.sin(Math.toRadians(angle)));
                 }
                 drawRotatedText(gc, text, x, y, angle);

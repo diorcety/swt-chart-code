@@ -6,8 +6,8 @@
  *******************************************************************************/
 package org.swtchart.internal;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
-import org.swtchart.IAxisSet;
 import org.swtchart.IAxis.Position;
+import org.swtchart.IAxisSet;
 import org.swtchart.internal.axis.Axis;
 import org.swtchart.internal.axis.AxisTickLabels;
 import org.swtchart.internal.axis.AxisTickMarks;
@@ -53,6 +53,12 @@ public class ChartLayout extends Layout {
     /** the right axis width */
     private int rightAxisWidth;
 
+    /** the plot area width */
+    private int plotAreaWidth;
+
+    /** the plot area height */
+    private int plotAreaHeight;
+
     /** the chart title */
     private ChartTitle title;
 
@@ -63,7 +69,15 @@ public class ChartLayout extends Layout {
     private PlotArea plot;
 
     /** the axes */
-    private List<Axis> axes;
+    private Axis[] axes;
+
+    /** the horizontal axes */
+    private Axis[] horizontalAxes;
+
+    /** the vertical axes */
+    private Axis[] verticalAxes;
+    
+    private Map<Axis, AxisLayoutData> axisLayoutDataMap;
 
     /** the offset for bottom axis */
     private int bottomAxisOffset = 0;
@@ -84,51 +98,11 @@ public class ChartLayout extends Layout {
     public static final int PADDING = 5;
 
     /**
-     * Axis layout data.
-     */
-    private static class AxisLayoutData {
-
-        /** the axis tick marks */
-        public AxisTickMarks axisTickMarks;
-
-        /** the axis tick labels */
-        public AxisTickLabels axisTickLabels;
-
-        /** the axis title */
-        public AxisTitle axisTitle;
-
-        /** the axis title layout data */
-        public ChartLayoutData titleLayoutdata;
-
-        /** the tick label layout data */
-        public ChartLayoutData tickLabelsLayoutdata;
-
-        /** the tick marks layout data */
-        public ChartLayoutData tickMarksLayoutdata;
-
-        /**
-         * Constructor.
-         * 
-         * @param axis
-         *            the axis
-         */
-        public AxisLayoutData(Axis axis) {
-            axisTickMarks = axis.getTick().getAxisTickMarks();
-            axisTickLabels = axis.getTick().getAxisTickLabels();
-            axisTitle = (AxisTitle) axis.getTitle();
-
-            titleLayoutdata = (ChartLayoutData) axisTitle.getLayoutData();
-            tickLabelsLayoutdata = axisTickLabels.getLayoutData();
-            tickMarksLayoutdata = axisTickMarks.getLayoutData();
-        }
-    }
-
-    /**
      * Constructor.
      */
     public ChartLayout() {
         initWidgetSizeVariables();
-        axes = new ArrayList<Axis>();
+        axisLayoutDataMap = new HashMap<Axis, AxisLayoutData>();
     }
 
     /**
@@ -143,6 +117,8 @@ public class ChartLayout extends Layout {
         rightAxisWidth = 0;
         legendWidth = 0;
         legendHeight = 0;
+        plotAreaWidth = 0;
+        plotAreaHeight = 0;
     }
 
     /*
@@ -163,10 +139,17 @@ public class ChartLayout extends Layout {
             return;
         }
 
-        initWidgetSizeVariables();
-        computeControlSize();
-
         Rectangle r = composite.getClientArea();
+        
+        initWidgetSizeVariables();
+        initTitleAndLegendSize();
+        initAxisSize();
+
+        computePlotAreaSize(r);
+        computeAxisSize(r);
+        adjustForRotatedTickLabels(r);
+        adjustForMostLeftRightTickLabel(r);
+
         layoutTitle(r);
         layoutLegend(r);
         layoutPlot(r);
@@ -181,9 +164,7 @@ public class ChartLayout extends Layout {
      * @return true if all children found
      */
     private boolean parseControls(Composite composite) {
-        Control[] children = composite.getChildren();
-        axes.clear();
-        for (Control child : children) {
+        for (Control child : composite.getChildren()) {
             if (child instanceof Legend) {
                 legend = (Legend) child;
             } else if (child instanceof ChartTitle) {
@@ -196,14 +177,19 @@ public class ChartLayout extends Layout {
         if (composite instanceof Chart) {
             IAxisSet axisSet = ((Chart) composite).getAxisSet();
             if (axisSet != null) {
-                IAxis[] axisArray = axisSet.getAxes();
-                for (IAxis axis : axisArray) {
-                    axes.add((Axis) axis);
+                axes = (Axis[]) axisSet.getAxes();
+
+                if (((Chart) composite).getOrientation() == SWT.HORIZONTAL) {
+                    horizontalAxes = (Axis[]) axisSet.getXAxes();
+                    verticalAxes = (Axis[]) axisSet.getYAxes();
+                } else {
+                    verticalAxes = (Axis[]) axisSet.getXAxes();
+                    horizontalAxes = (Axis[]) axisSet.getYAxes();
                 }
             }
         }
 
-        if (title == null || legend == null || plot == null || axes.size() < 2) {
+        if (title == null || legend == null || plot == null || axes == null) {
             // the initialization of chart is not completed yet
             return false;
         }
@@ -211,13 +197,20 @@ public class ChartLayout extends Layout {
     }
 
     /**
-     * Computes the size of child controls.
+     * Initializes the size of title and legend.
      */
-    private void computeControlSize() {
+    private void initTitleAndLegendSize() {
         titleWidth = ((ChartLayoutData) title.getLayoutData()).widthHint;
         titleHeight = ((ChartLayoutData) title.getLayoutData()).heightHint;
         legendWidth = ((ChartLayoutData) legend.getLayoutData()).widthHint;
         legendHeight = ((ChartLayoutData) legend.getLayoutData()).heightHint;
+    }
+    
+    /**
+     * Initializes the size of axes.
+     */
+    private void initAxisSize() {
+        axisLayoutDataMap.clear();
 
         for (Axis axis : axes) {
             AxisLayoutData layoutData = new AxisLayoutData(axis);
@@ -226,7 +219,8 @@ public class ChartLayout extends Layout {
                     || layoutData.tickMarksLayoutdata == null) {
                 continue;
             }
-
+            axisLayoutDataMap.put(axis, layoutData);
+            
             Position position = axis.getPosition();
             if (position == Position.Primary && axis.isHorizontalAxis()) {
                 bottomAxisHeight += layoutData.titleLayoutdata.heightHint
@@ -247,6 +241,161 @@ public class ChartLayout extends Layout {
                         + layoutData.tickLabelsLayoutdata.widthHint
                         + layoutData.tickMarksLayoutdata.widthHint;
             }
+        }
+    }
+
+    /**
+     * Computes the size of plot area.
+     * 
+     * @param r
+     *            the rectangle to layout
+     */
+    private void computePlotAreaSize(Rectangle r) {
+        int legendPosition = legend.getPosition();
+
+        plotAreaWidth = r.width
+                - leftAxisWidth
+                - rightAxisWidth
+                - (legendPosition == SWT.LEFT || legendPosition == SWT.RIGHT ? legendWidth
+                        + (legendWidth == 0 ? 0 : PADDING)
+                        : 0) - MARGIN * 2;
+
+        plotAreaHeight = r.height
+                - bottomAxisHeight
+                - topAxisHeight
+                - titleHeight
+                - MARGIN
+                * 2
+                - (titleHeight == 0 ? 0 : PADDING)
+                - (legendPosition == SWT.TOP || legendPosition == SWT.BOTTOM ? legendHeight
+                        + (legendHeight == 0 ? 0 : PADDING)
+                        : 0);
+    }
+
+    /**
+     * Computes the size of axes updating tick labels.
+     * 
+     * @param r
+     *            the rectangle to layout
+     */
+    private void computeAxisSize(Rectangle r) {
+
+        // update vertical axis tick labels
+        updateVerticalAxisTick();
+
+        // compute axis width
+        for (IAxis axis : verticalAxes) {
+            int tickLabelMaxLength = ((Axis) axis).getTick()
+                    .getAxisTickLabels().getTickLabelMaxLength();
+
+            AxisLayoutData axisLayout = axisLayoutDataMap.get(axis);
+            axisLayout.tickLabelsLayoutdata.widthHint += tickLabelMaxLength;
+            if (axis.getPosition() == Position.Primary) {
+                leftAxisWidth += tickLabelMaxLength;
+            } else {
+                rightAxisWidth += tickLabelMaxLength;
+            }
+        }
+
+        // update plot area width
+        computePlotAreaSize(r);
+
+        // update horizontal axis tick labels
+        updateHorizontalAxisTick();
+    }
+
+    /**
+     * Adjust the axis size for rotated tick labels.
+     * 
+     * @param r
+     *            the rectangle to layout
+     */
+    private void adjustForRotatedTickLabels(Rectangle r) {
+        for (IAxis axis : horizontalAxes) {
+            double angle = axis.getTick().getTickLabelAngle();
+            if (angle == 0) {
+                continue;
+            }
+
+            // update tick label height
+            int tickLabelMaxLength = ((Axis) axis).getTick()
+                    .getAxisTickLabels().getTickLabelMaxLength();
+            AxisLayoutData layoutData = axisLayoutDataMap.get(axis);
+            int height = Axis.MARGIN
+                    + (int) (tickLabelMaxLength
+                            * Math.sin(Math.toRadians(angle)) + Util
+                            .getExtentInGC(layoutData.axisTickLabels.getFont(),
+                                    "dummy").y
+                            * Math.cos(Math.toRadians(angle)));
+            int delta = height - layoutData.tickLabelsLayoutdata.heightHint;
+            layoutData.tickLabelsLayoutdata.heightHint = height;
+
+            // update axis height
+            if (axis.getPosition() == Position.Primary) {
+                bottomAxisHeight += delta;
+            } else {
+                topAxisHeight += delta;
+            }
+
+            // update plot area height
+            computePlotAreaSize(r);
+
+            updateVerticalAxisTick();
+        }
+    }
+
+    /**
+     * Adjust the axis size for most left/right tick label.
+     * 
+     * @param r
+     *            the rectangle to layout
+     */
+    private void adjustForMostLeftRightTickLabel(Rectangle r) {
+
+        // get axis margin hint
+        int rightAxisMarginHint = 0;
+        int leftAxisMarginHint = 0;
+        for (IAxis axis : horizontalAxes) {
+            rightAxisMarginHint = Math.max(rightAxisMarginHint,
+                    ((Axis) axis).getTick().getAxisTickLabels()
+                            .getRightMarginHint(plotAreaWidth));
+            leftAxisMarginHint = Math.max(leftAxisMarginHint,
+                    ((Axis) axis).getTick().getAxisTickLabels()
+                            .getLeftMarginHint(plotAreaWidth));
+        }
+
+        // have space to draw most right tick label on horizontal axis
+        if ((legendWidth == 0 || legend.getPosition() != SWT.RIGHT)
+                && rightAxisWidth < rightAxisMarginHint) {
+            rightAxisWidth = rightAxisMarginHint;
+            computePlotAreaSize(r);
+            updateHorizontalAxisTick();
+        }
+
+        // have space to draw most left tick label on horizontal axis
+        if ((legendWidth == 0 || legend.getPosition() != SWT.LEFT)
+                && leftAxisWidth < leftAxisMarginHint) {
+            leftAxisWidth = leftAxisMarginHint;
+            computePlotAreaSize(r);
+            updateHorizontalAxisTick();
+        }
+    }
+
+    /**
+     * Updates the horizontal axis tick.
+     */
+    private void updateHorizontalAxisTick() {
+        for (IAxis axis : horizontalAxes) {
+            ((Axis) axis).getTick().updateTick(plotAreaWidth);
+        }
+    }
+
+    /**
+     * Updates the vertical axis tick.
+     */
+    private void updateVerticalAxisTick(){
+        for (IAxis axis : verticalAxes) {
+            ((Axis) axis).getTick().updateTick(plotAreaHeight);
         }
     }
 
@@ -321,24 +470,8 @@ public class ChartLayout extends Layout {
                 + (titleHeight == 0 ? 0 : PADDING)
                 + (legendPosition == SWT.TOP ? legendHeight
                         + (legendHeight == 0 ? 0 : PADDING) : 0);
-        int width = r.width
-                - leftAxisWidth
-                - rightAxisWidth
-                - (legendPosition == SWT.LEFT || legendPosition == SWT.RIGHT ? legendWidth
-                        + (legendWidth == 0 ? 0 : PADDING)
-                        : 0) - MARGIN * 2;
-        int height = r.height
-                - bottomAxisHeight
-                - topAxisHeight
-                - titleHeight
-                - MARGIN
-                * 2
-                - (titleHeight == 0 ? 0 : PADDING)
-                - (legendPosition == SWT.TOP || legendPosition == SWT.BOTTOM ? legendHeight
-                        + (legendHeight == 0 ? 0 : PADDING)
-                        : 0);
 
-        plot.setBounds(x, y, width, height);
+        plot.setBounds(x, y, plotAreaWidth, plotAreaHeight);
     }
 
     /**
@@ -354,13 +487,9 @@ public class ChartLayout extends Layout {
         rightAxisOffset = 0;
 
         for (Axis axis : axes) {
-            AxisLayoutData layoutData = new AxisLayoutData(axis);
-            if (layoutData.titleLayoutdata == null
-                    || layoutData.tickLabelsLayoutdata == null
-                    || layoutData.tickMarksLayoutdata == null) {
-                continue;
-            }
+            AxisLayoutData layoutData = axisLayoutDataMap.get(axis);
             Position position = axis.getPosition();
+
             if (position == Position.Primary && axis.isHorizontalAxis()) {
                 layoutBottomAxis(r, layoutData);
             } else if (position == Position.Secondary
@@ -386,12 +515,7 @@ public class ChartLayout extends Layout {
     private void layoutBottomAxis(Rectangle r, AxisLayoutData layoutData) {
         int legendPosition = legend.getPosition();
 
-        int width = r.width
-                - leftAxisWidth
-                - rightAxisWidth
-                - (legendPosition == SWT.LEFT || legendPosition == SWT.RIGHT ? legendWidth
-                        + (legendWidth == 0 ? 0 : PADDING)
-                        : 0) - MARGIN * 2;
+        int width = plotAreaWidth;
         int height = layoutData.titleLayoutdata.heightHint;
         int x = leftAxisWidth
                 + MARGIN
@@ -437,12 +561,7 @@ public class ChartLayout extends Layout {
     private void layoutTopAxis(Rectangle r, AxisLayoutData layoutData) {
         int legendPosition = legend.getPosition();
 
-        int width = r.width
-                - leftAxisWidth
-                - rightAxisWidth
-                - (legendPosition == SWT.LEFT || legendPosition == SWT.RIGHT ? legendWidth
-                        + (legendWidth == 0 ? 0 : PADDING)
-                        : 0) - MARGIN * 2;
+        int width = plotAreaWidth;
         int height = layoutData.titleLayoutdata.heightHint;
         int x = leftAxisWidth
                 + MARGIN
@@ -480,16 +599,7 @@ public class ChartLayout extends Layout {
         int yAxisMargin = Axis.MARGIN + AxisTickMarks.TICK_LENGTH;
 
         int width = layoutData.titleLayoutdata.widthHint;
-        int height = r.height
-                - bottomAxisHeight
-                - topAxisHeight
-                - titleHeight
-                - MARGIN
-                * 2
-                - ((titleHeight == 0) ? 0 : PADDING)
-                - (legendPosition == SWT.TOP || legendPosition == SWT.BOTTOM ? legendHeight
-                        + (legendHeight == 0 ? 0 : PADDING)
-                        : 0);
+        int height = plotAreaHeight;
         int x = MARGIN
                 + leftAxisOffset
                 + (legendPosition == SWT.LEFT ? legendWidth
@@ -531,16 +641,7 @@ public class ChartLayout extends Layout {
         int yAxisMargin = Axis.MARGIN + AxisTickMarks.TICK_LENGTH;
 
         int width = layoutData.titleLayoutdata.widthHint;
-        int height = r.height
-                - bottomAxisHeight
-                - topAxisHeight
-                - titleHeight
-                - MARGIN
-                * 2
-                - ((titleHeight == 0) ? 0 : PADDING)
-                - (legendPosition == SWT.TOP || legendPosition == SWT.BOTTOM ? legendHeight
-                        + (legendHeight == 0 ? 0 : PADDING)
-                        : 0);
+        int height = plotAreaHeight;
         int x = r.width
                 - width
                 - rightAxisOffset
@@ -568,5 +669,45 @@ public class ChartLayout extends Layout {
         x -= width;
         rightAxisOffset += width;
         layoutData.axisTickMarks.setBounds(x, y, width, height);
+    }
+
+    /**
+     * Axis layout data.
+     */
+    private static class AxisLayoutData {
+    
+        /** the axis tick marks */
+        public AxisTickMarks axisTickMarks;
+    
+        /** the axis tick labels */
+        public AxisTickLabels axisTickLabels;
+    
+        /** the axis title */
+        public AxisTitle axisTitle;
+    
+        /** the axis title layout data */
+        public ChartLayoutData titleLayoutdata;
+    
+        /** the tick label layout data */
+        public ChartLayoutData tickLabelsLayoutdata;
+    
+        /** the tick marks layout data */
+        public ChartLayoutData tickMarksLayoutdata;
+    
+        /**
+         * Constructor.
+         * 
+         * @param axis
+         *            the axis
+         */
+        public AxisLayoutData(Axis axis) {
+            axisTickMarks = axis.getTick().getAxisTickMarks();
+            axisTickLabels = axis.getTick().getAxisTickLabels();
+            axisTitle = (AxisTitle) axis.getTitle();
+    
+            titleLayoutdata = (ChartLayoutData) axisTitle.getLayoutData();
+            tickLabelsLayoutdata = axisTickLabels.getLayoutData();
+            tickMarksLayoutdata = axisTickMarks.getLayoutData();
+        }
     }
 }
