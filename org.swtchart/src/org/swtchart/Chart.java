@@ -68,7 +68,7 @@ public class Chart extends Composite implements Listener {
      *            the style of widget to construct
      */
     public Chart(Composite parent, int style) {
-        super(parent, style);
+        super(parent, style | SWT.DOUBLE_BUFFERED);
 
         orientation = SWT.HORIZONTAL;
         compressEnabled = true;

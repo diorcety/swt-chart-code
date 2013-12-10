@@ -64,7 +64,7 @@ public class Title extends Canvas implements ITitle, PaintListener {
      *            the style
      */
     public Title(Chart parent, int style) {
-        super(parent, style);
+        super(parent, style | SWT.DOUBLE_BUFFERED);
 
         this.chart = parent;
         text = DEFAULT_TEXT;
