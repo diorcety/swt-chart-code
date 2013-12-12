@@ -13,6 +13,7 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
@@ -289,10 +290,30 @@ public class Title extends Canvas implements ITitle, PaintListener {
         boolean useStyleRanges = styleRanges != null;
 
         int textWidth;
+        int textHeight;
         if (useStyleRanges) {
             textWidth = textLayout.getBounds().width;
+            textHeight = textLayout.getBounds().height;
         } else {
             textWidth = gc.textExtent(text).x;
+            textHeight = gc.textExtent(text).y;
+        }
+
+        /*
+         * create image to draw text. If drawing text on rotated graphics
+         * context instead of drawing rotated image, the text shape becomes a
+         * bit ugly especially with small font with bold.
+         */
+        Image image = new Image(Display.getCurrent(), textWidth, textHeight);
+        GC tmpGc = new GC(image);
+
+        if (useStyleRanges) {
+            textLayout.draw(tmpGc, 0, 0);
+        } else {
+            tmpGc.setForeground(getForeground());
+            tmpGc.setBackground(getBackground());
+            tmpGc.setFont(getFont());
+            tmpGc.drawText(text, 0, 0);
         }
 
         // set transform to rotate
@@ -301,20 +322,17 @@ public class Title extends Canvas implements ITitle, PaintListener {
         transform.rotate(270);
         gc.setTransform(transform);
 
-        // draw text
+        // draw the image on the rotated graphics context
         int height = getSize().y;
         int y = (int) (height / 2d - textWidth / 2d);
         if (y < 0) {
             y = 0;
         }
-        if (useStyleRanges) {
-            textLayout.draw(gc, -y, 0);
-        } else {
-            gc.drawText(text, -y, 0);
-        }
+        gc.drawImage(image, -y, 0);
 
-        // clear transform
+        // dispose resources
+        tmpGc.dispose();
         transform.dispose();
-        gc.setTransform(null);
+        image.dispose();
     }
 }
