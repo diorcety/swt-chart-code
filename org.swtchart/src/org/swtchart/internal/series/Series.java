@@ -96,6 +96,9 @@ abstract public class Series implements ISeries {
     /** the state indicating if the series is visible in legend */
     private boolean visibleInLegend;
 
+    /** the series description */
+    private String description;
+
     /** the list of dispose listeners */
     private List<IDisposeListener> listeners;
 
@@ -610,6 +613,22 @@ abstract public class Series implements ISeries {
      */
     public boolean isVisibleInLegend() {
         return visibleInLegend;
+    }
+
+    /*
+     * @see ISeries#setDescription(String)
+     */
+    @Override
+    public void setDescription(String description) {
+    this.description = description;
+    }
+
+    /*
+     * @see ISeries#getDescription()
+     */
+    @Override
+    public String getDescription() {
+    return description;
     }
 
     /**

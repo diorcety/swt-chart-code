@@ -202,6 +202,26 @@ public interface ISeries {
     boolean isVisibleInLegend();
 
     /**
+     * Sets the series description.
+     * <p>
+     * For example, you may store the description explaining what this series
+     * is, and display it on tool tip with mouse hover on the series.
+     * <p>
+     * By default, legend displays the description, when it is set.
+     * 
+     * @param description
+     *            the series description, or <tt>null</tt> to clear it
+     */
+    void setDescription(String description);
+
+    /**
+     * Gets the series description
+     * 
+     * @return the series description, or <tt>null<tt> if not set
+     */
+    String getDescription();
+
+    /**
      * Gets the pixel coordinates corresponding to the given series index.
      * 
      * @param index
