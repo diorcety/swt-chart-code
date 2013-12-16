@@ -127,8 +127,6 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea {
         }
 
         // draw behind series
-        GC prevGC = e.gc;
-        e.gc = gc;
         for (ICustomPaintListener listener : paintListeners) {
             if (listener.drawBehindSeries()) {
                 listener.paintControl(e);
@@ -153,9 +151,6 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea {
                 listener.paintControl(e);
             }
         }
-        e.gc = prevGC;
-
-        gc.dispose();
     }
 
     /*
