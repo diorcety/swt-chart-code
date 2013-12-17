@@ -77,6 +77,7 @@ public class ChartLayout extends Layout {
     /** the vertical axes */
     private Axis[] verticalAxes;
     
+    /** the map between axis and axis layout data */
     private Map<Axis, AxisLayoutData> axisLayoutDataMap;
 
     /** the offset for bottom axis */

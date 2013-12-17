@@ -618,17 +618,15 @@ abstract public class Series implements ISeries {
     /*
      * @see ISeries#setDescription(String)
      */
-    @Override
     public void setDescription(String description) {
-    this.description = description;
+        this.description = description;
     }
 
     /*
      * @see ISeries#getDescription()
      */
-    @Override
     public String getDescription() {
-    return description;
+        return description;
     }
 
     /**

@@ -351,6 +351,13 @@ public class Legend extends Composite implements ILegend, PaintListener {
         setLayoutData(new ChartLayoutData(width, height));
     }
 
+    /**
+     * Gets the legend label.
+     * 
+     * @param series
+     *            the series
+     * @return the legend label
+     */
     private static String getLegendLabel(ISeries series) {
         String description = series.getDescription();
 

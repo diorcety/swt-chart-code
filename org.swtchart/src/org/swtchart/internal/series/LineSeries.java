@@ -512,7 +512,7 @@ public class LineSeries extends Series implements ILineSeries {
      * @param isHorizontal
      *            true if orientation is horizontal
      */
-    private void drawLine(GC gc, Axis xAxis, Axis yAxis, double[] xseries,
+    private static void drawLine(GC gc, Axis xAxis, Axis yAxis, double[] xseries,
             double[] yseries, boolean isHorizontal) {
         double xLower = xAxis.getRange().lower;
         double xUpper = xAxis.getRange().upper;

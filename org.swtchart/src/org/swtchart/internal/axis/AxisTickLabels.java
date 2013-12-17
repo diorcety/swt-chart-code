@@ -943,7 +943,7 @@ public class AxisTickLabels implements PaintListener {
      * @param angle
      *            the angle
      */
-    private void drawRotatedText(GC gc, String text, float x, float y, int angle) {
+    private static void drawRotatedText(GC gc, String text, float x, float y, int angle) {
 
         // set transform to rotate
         Transform transform = new Transform(gc.getDevice());
