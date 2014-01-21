@@ -122,6 +122,7 @@ public class Grid implements IGrid {
             xWidth = height;
         }
 
+        Color oldForeground = gc.getForeground();
         gc.setForeground(getForeground());
         ArrayList<Integer> tickLabelPosition = axis.getTick()
                 .getAxisTickLabels().getTickLabelPositions();
@@ -164,5 +165,6 @@ public class Grid implements IGrid {
                 }
             }
         }
+        gc.setForeground(oldForeground);
     }
 }

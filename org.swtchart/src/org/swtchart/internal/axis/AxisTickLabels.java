@@ -879,13 +879,18 @@ public class AxisTickLabels implements PaintListener {
             return;
         }
 
+        Color oldBackground = e.gc.getBackground();
         e.gc.setBackground(chart.getBackground());
+        Color oldForeground = e.gc.getForeground();
         e.gc.setForeground(getForeground());
         if (axis.isHorizontalAxis()) {
             drawXTick(e.gc);
         } else {
             drawYTick(e.gc);
         }
+
+        e.gc.setBackground(oldBackground);
+        e.gc.setForeground(oldForeground);
     }
 
     /**

@@ -118,6 +118,7 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea {
         GC gc = e.gc;
 
         // draw the plot area background
+        Color oldBackground = gc.getBackground();
         gc.setBackground(getBackground());
         gc.fillRectangle(0, 0, p.x, p.y);
 
@@ -151,6 +152,8 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea {
                 listener.paintControl(e);
             }
         }
+        
+        e.gc.setBackground(oldBackground);
     }
 
     /*

@@ -171,16 +171,22 @@ public class AxisTickMarks implements PaintListener {
     public void paintControl(PaintEvent e) {
         ArrayList<Integer> tickLabelPositions = axis.getTick()
                 .getAxisTickLabels().getTickLabelPositions();
+        Color oldBackground = e.gc.getBackground();
         e.gc.setBackground(chart.getBackground());
+        Color oldForeground = e.gc.getForeground();
         e.gc.setForeground(getForeground());
         Rectangle oldClipping = e.gc.getClipping();
         e.gc.setClipping(bounds);
+
         if (axis.isHorizontalAxis()) {
             drawXTickMarks(e.gc, tickLabelPositions, axis.getPosition());
         } else {
             drawYTickMarks(e.gc, tickLabelPositions, axis.getPosition());
         }
+
         e.gc.setClipping(oldClipping);
+        e.gc.setBackground(oldBackground);
+        e.gc.setForeground(oldForeground);
     }
 
     /**

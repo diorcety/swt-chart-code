@@ -484,15 +484,21 @@ public class BarSeries extends Series implements IBarSeries {
         int alpha = gc.getAlpha();
         gc.setAlpha(ALPHA);
 
+        Color oldBackground = gc.getBackground();
         gc.setBackground(getBarColor());
+
         gc.fillRectangle(h, v, width, height);
 
         gc.setLineStyle(SWT.LINE_SOLID);
         Color frameColor = getFrameColor(getBarColor());
+        Color oldForeground = gc.getForeground();
         gc.setForeground(frameColor);
+        
         gc.drawRectangle(h, v, width, height);
         frameColor.dispose();
 
         gc.setAlpha(alpha);
+        gc.setBackground(oldBackground);
+        gc.setForeground(oldForeground);
     }
 }

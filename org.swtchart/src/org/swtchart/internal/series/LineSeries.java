@@ -455,6 +455,7 @@ public class LineSeries extends Series implements ILineSeries {
         }
 
         gc.setLineStyle(Util.getIndexDefinedInSWT(lineStyle));
+        Color oldForeground = gc.getForeground();
         gc.setForeground(getLineColor());
 
         boolean isHorizontal = xAxis.isHorizontalAxis();
@@ -486,6 +487,8 @@ public class LineSeries extends Series implements ILineSeries {
         } else {
             drawLine(gc, xAxis, yAxis, xseries, yseries, isHorizontal);
         }
+
+        gc.setForeground(oldForeground);
     }
 
     /**
@@ -581,6 +584,7 @@ public class LineSeries extends Series implements ILineSeries {
     private void drawArea(GC gc, int[] p, boolean isHorizontal) {
         int alpha = gc.getAlpha();
         gc.setAlpha(ALPHA);
+        Color oldBackground = gc.getBackground();
         gc.setBackground(getLineColor());
 
         int[] pointArray;
@@ -598,7 +602,9 @@ public class LineSeries extends Series implements ILineSeries {
         }
 
         gc.fillPolygon(pointArray);
+
         gc.setAlpha(alpha);
+        gc.setBackground(oldBackground);
     }
 
     /**
@@ -672,7 +678,9 @@ public class LineSeries extends Series implements ILineSeries {
     public void drawSeriesSymbol(GC gc, int h, int v, Color color) {
         int oldAntialias = gc.getAntialias();
         gc.setAntialias(SWT.ON);
+        Color oldForeground = gc.getForeground();
         gc.setForeground(color);
+        Color oldBackground = gc.getBackground();
         gc.setBackground(color);
 
         switch (symbolType) {
@@ -716,5 +724,7 @@ public class LineSeries extends Series implements ILineSeries {
             break;
         }
         gc.setAntialias(oldAntialias);
+        gc.setBackground(oldBackground);
+        gc.setForeground(oldForeground);
     }
 }

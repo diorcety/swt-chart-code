@@ -181,6 +181,7 @@ public class SeriesLabel implements ISeriesLabel {
             return;
         }
 
+        Color oldForeground = gc.getForeground();
         gc.setForeground(color);
         gc.setFont(getFont());
 
@@ -209,6 +210,8 @@ public class SeriesLabel implements ISeriesLabel {
         } else if (alignment == SWT.BOTTOM) {
             gc.drawString(text, h, v, true);
         }
+
+        gc.setForeground(oldForeground);
     }
 
     /**
