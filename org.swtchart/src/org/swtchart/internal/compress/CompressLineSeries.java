@@ -55,7 +55,7 @@ public class CompressLineSeries extends Compress {
 
         isPrevOutOfRange = true;
 
-        for (int i = 0; i < xSeries.length; i++) {
+        for (int i = 0; i < xSeries.length && i < ySeries.length; i++) {
             STATE state = getState(i);
 
             switch (state) {

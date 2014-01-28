@@ -24,7 +24,7 @@ public class CompressBarSeries extends Compress {
         double maxY = Double.NaN;
         int prevIndex = 0;
 
-        for (int i = 0; i < xSeries.length; i++) {
+        for (int i = 0; i < xSeries.length && i < ySeries.length; i++) {
             if (xSeries[i] >= config.getXLowerValue()) {
                 if (isInSameGridXAsPrevious(xSeries[i])) {
                     if (maxY < ySeries[i]) {

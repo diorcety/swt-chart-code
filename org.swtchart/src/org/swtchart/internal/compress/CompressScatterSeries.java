@@ -27,7 +27,7 @@ public class CompressScatterSeries extends Compress {
             ArrayList<Double> yList, ArrayList<Integer> indexList) {
 
         if (isLineVisible) {
-            for (int i = 0; i < xSeries.length; i++) {
+            for (int i = 0; i < xSeries.length && i < ySeries.length; i++) {
                 if (!isInSameGridAsPrevious(xSeries[i], ySeries[i])) {
                     addToList(xList, yList, indexList, xSeries[i], ySeries[i],
                             i);
@@ -44,7 +44,7 @@ public class CompressScatterSeries extends Compress {
             // initialize flag
             occupied = new boolean[width][height];
 
-            for (int i = 0; i < xSeries.length; i++) {
+            for (int i = 0; i < xSeries.length && i < ySeries.length; i++) {
                 if (xSeries[i] >= xLower && xSeries[i] <= xUpper
                         && ySeries[i] >= yLower && ySeries[i] <= yUpper
                         && !isOccupied(xSeries[i], ySeries[i])) {
