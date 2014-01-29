@@ -981,7 +981,7 @@ public class AxisTickLabels implements PaintListener {
 
             if (tickVisibilities.get(i) == true) {
                 String text = tickLabels.get(i);
-                int x = 0;
+                int x = Axis.MARGIN;
                 if (tickLabels.get(0).startsWith("-") && !text.startsWith("-")) {
                     x += gc.textExtent("-").x;
                 }

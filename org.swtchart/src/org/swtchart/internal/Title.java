@@ -211,7 +211,7 @@ public class Title extends Canvas implements ITitle, PaintListener {
             }
         } else {
             width = 0;
-            height = ChartLayout.MARGIN;
+            height = 0;
         }
 
         if (isHorizontal()) {

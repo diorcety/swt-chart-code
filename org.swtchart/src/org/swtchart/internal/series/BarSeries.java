@@ -163,7 +163,9 @@ public class BarSeries extends Series implements IBarSeries {
         int cnt = 0;
         for (int i = 0; i < xSeries.length; i++) {
             if (cnt < comporessedXSeries.length
-                    && comporessedXSeries[cnt] == xSeries[i]) {
+                    && comporessedXSeries[cnt] == xSeries[i]
+                    && compressedBounds[cnt].width != 0
+                    && compressedBounds[cnt].height != 0) {
                 rs[i] = compressedBounds[cnt++];
             }
         }
