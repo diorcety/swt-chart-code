@@ -50,7 +50,7 @@ public class AxisTitle extends Title {
      *            the direction
      */
     public AxisTitle(Chart chart, int style, Axis axis, Direction direction) {
-        super(chart, style);
+        super(chart);
         this.axis = axis;
         this.direction = direction;
         defaultFont = new Font(Display.getDefault(), "Tahoma",

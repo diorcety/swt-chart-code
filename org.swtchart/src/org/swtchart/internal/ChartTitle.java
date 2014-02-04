@@ -21,11 +21,9 @@ public class ChartTitle extends Title {
      *
      * @param chart
      *            the plot chart
-     * @param style
-     *            the style
      */
-    public ChartTitle(Chart chart, int style) {
-        super(chart, style);
+    public ChartTitle(Chart chart) {
+        super(chart);
         setText(getDefaultText());
     }
 

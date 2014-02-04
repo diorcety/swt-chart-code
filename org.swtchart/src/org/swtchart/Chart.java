@@ -71,7 +71,7 @@ public class Chart extends Composite implements Listener {
 
         setLayout(new ChartLayout());
 
-        title = new ChartTitle(this, SWT.NONE);
+        title = new ChartTitle(this);
         title.setLayoutData(new ChartLayoutData(SWT.DEFAULT, 100));
         legend = new Legend(this, SWT.NONE);
         legend.setLayoutData(new ChartLayoutData(200, SWT.DEFAULT));

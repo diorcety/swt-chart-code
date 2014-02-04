@@ -18,7 +18,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.graphics.Transform;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.swtchart.Chart;
 import org.swtchart.Constants;
@@ -27,13 +26,19 @@ import org.swtchart.ITitle;
 /**
  * A base class for title.
  */
-public class Title extends Canvas implements ITitle, PaintListener {
+public class Title implements ITitle, PaintListener {
 
     /** the chart */
     protected Chart chart;
 
     /** the title text */
     protected String text;
+
+    /** the foreground color */
+    private Color foreground;
+
+    /** the font */
+    private Font font;
 
     /** the style ranges */
     private StyleRange[] styleRanges;
@@ -46,6 +51,12 @@ public class Title extends Canvas implements ITitle, PaintListener {
 
     /** the default font */
     private final Font defaultFont;
+
+    /** the bounds of title */
+    private Rectangle bounds;
+
+    /** the layout data */
+    private ChartLayoutData layoutData;
 
     /** the default font size */
     private static final int DEFAULT_FONT_SIZE = Constants.LARGE_FONT_SIZE;
@@ -61,11 +72,8 @@ public class Title extends Canvas implements ITitle, PaintListener {
      * 
      * @param parent
      *            the parent composite
-     * @param style
-     *            the style
      */
-    public Title(Chart parent, int style) {
-        super(parent, style | SWT.DOUBLE_BUFFERED);
+    public Title(Chart parent) {
 
         this.chart = parent;
         text = DEFAULT_TEXT;
@@ -74,11 +82,11 @@ public class Title extends Canvas implements ITitle, PaintListener {
         defaultFont = new Font(Display.getDefault(), "Tahoma",
                 DEFAULT_FONT_SIZE, SWT.BOLD);
         textLayout = new TextLayout(Display.getDefault());
-
-        setFont(defaultFont);
+        bounds = new Rectangle(0, 0, 0, 0);
+        font = defaultFont;
         setForeground(Display.getDefault().getSystemColor(DEFAULT_FOREGROUND));
 
-        addPaintListener(this);
+        parent.addPaintListener(this);
     }
 
     /*
@@ -114,30 +122,59 @@ public class Title extends Canvas implements ITitle, PaintListener {
         return text;
     }
 
-    /*
-     * @see Canvas#setFont(Font)
+    /**
+     * Sets the font.
+     * 
+     * @param font
+     *            the font
      */
-    @Override
     public void setFont(Font font) {
         if (font == null) {
-            super.setFont(defaultFont);
+            this.font = defaultFont;
+        } else if (font.isDisposed()) {
+            throw new IllegalArgumentException("disposed font is given");
         } else {
-            super.setFont(font);
+            this.font = font;
         }
         chart.updateLayout();
     }
 
-    /*
-     * @see Control#setForeground(Color)
+    /**
+     * Gets the font.
+     * 
+     * @return the font
      */
-    @Override
+    public Font getFont() {
+        if (font.isDisposed()) {
+            font = defaultFont;
+        }
+        return font;
+    }
+
+    /**
+     * Sets the foreground color.
+     * 
+     * @param color
+     *            the foreground color
+     */
     public void setForeground(Color color) {
         if (color == null) {
-            super.setForeground(Display.getDefault().getSystemColor(
-                    DEFAULT_FOREGROUND));
+            foreground = Display.getDefault()
+                    .getSystemColor(DEFAULT_FOREGROUND);
+        } else if (color.isDisposed()) {
+            throw new IllegalArgumentException("disposed color is given");
         } else {
-            super.setForeground(color);
+            foreground = color;
         }
+    }
+
+    /**
+     * Gets the foreground color.
+     * 
+     * @return the foreground color
+     */
+    public Color getForeground() {
+        return foreground;
     }
 
     /*
@@ -164,9 +201,8 @@ public class Title extends Canvas implements ITitle, PaintListener {
     }
 
     /*
-     * @see Control#setVisible(boolean)
+     * @see ITitle#setVisible(boolean)
      */
-    @Override
     public void setVisible(boolean isVisible) {
         if (this.isVisible == isVisible) {
             return;
@@ -177,9 +213,8 @@ public class Title extends Canvas implements ITitle, PaintListener {
     }
 
     /*
-     * @see Control#isVisible()
+     * @see ITitle#isVisible()
      */
-    @Override
     public boolean isVisible() {
         return isVisible;
     }
@@ -221,18 +256,36 @@ public class Title extends Canvas implements ITitle, PaintListener {
         }
     }
 
-    /*
-     * @see Widget#dispose()
+    /**
+     * Sets the layout data.
+     * 
+     * @param layoutData
+     *            the layout data
      */
-    @Override
+    public void setLayoutData(ChartLayoutData layoutData) {
+        this.layoutData = layoutData;
+    }
+
+    /**
+     * Gets the layout data.
+     * 
+     * @return the layout data
+     */
+    public ChartLayoutData getLayoutData() {
+        return layoutData;
+    }
+
+    /**
+     * Disposes the resources.
+     */
     public void dispose() {
-        super.dispose();
         if (!defaultFont.isDisposed()) {
             defaultFont.dispose();
         }
         if (!textLayout.isDisposed()) {
             textLayout.dispose();
         }
+        chart.removePaintListener(this);
     }
 
     /*
@@ -243,11 +296,44 @@ public class Title extends Canvas implements ITitle, PaintListener {
             return;
         }
 
+        Font oldFont = e.gc.getFont();
+        Color oldForeground = getForeground();
+        e.gc.setFont(getFont());
+        e.gc.setForeground(getForeground());
+
         if (isHorizontal()) {
             drawHorizontalTitle(e.gc);
         } else {
             drawVerticalTitle(e.gc);
         }
+
+        e.gc.setFont(oldFont);
+        e.gc.setForeground(oldForeground);
+    }
+
+    /**
+     * Sets the bounds on chart panel.
+     * 
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
+     * @param width
+     *            the width
+     * @param height
+     *            the height
+     */
+    public void setBounds(int x, int y, int width, int height) {
+        bounds = new Rectangle(x, y, width, height);
+    }
+
+    /**
+     * Gets the bounds on chart panel.
+     * 
+     * @return the bounds on chart panel
+     */
+    public Rectangle getBounds() {
+        return bounds;
     }
 
     /**
@@ -259,24 +345,13 @@ public class Title extends Canvas implements ITitle, PaintListener {
     private void drawHorizontalTitle(GC gc) {
         boolean useStyleRanges = styleRanges != null;
 
-        int width = getSize().x;
-        int textWidth;
-        if (useStyleRanges) {
-            textWidth = textLayout.getBounds().width;
-        } else {
-            textWidth = gc.textExtent(text).x;
-        }
-
-        int x = (int) (width / 2d - textWidth / 2d);
-        if (x < 0) {
-            // this happens when window size is too small
-            x = 0;
-        }
+        int x = getBounds().x;
+        int y = getBounds().y;
 
         if (useStyleRanges) {
-            textLayout.draw(gc, x, 0);
+            textLayout.draw(gc, x, y);
         } else {
-            gc.drawText(text, x, 0, true);
+            gc.drawText(text, x, y, true);
         }
     }
 
@@ -289,15 +364,12 @@ public class Title extends Canvas implements ITitle, PaintListener {
     private void drawVerticalTitle(GC gc) {
         boolean useStyleRanges = styleRanges != null;
 
-        int textWidth;
-        int textHeight;
-        if (useStyleRanges) {
-            textWidth = textLayout.getBounds().width;
-            textHeight = textLayout.getBounds().height;
-        } else {
-            textWidth = gc.textExtent(text).x;
-            textHeight = gc.textExtent(text).y;
-        }
+        int textWidth = getBounds().height;
+        int textHeight = getBounds().width;
+
+        // widen for italic font
+        int margin = textHeight / 10;
+        textWidth += margin;
 
         /*
          * create image to draw text. If drawing text on rotated graphics
@@ -310,25 +382,28 @@ public class Title extends Canvas implements ITitle, PaintListener {
         if (useStyleRanges) {
             textLayout.draw(tmpGc, 0, 0);
         } else {
+            tmpGc.setBackground(chart.getBackground());
             tmpGc.setForeground(getForeground());
-            tmpGc.setBackground(getBackground());
             tmpGc.setFont(getFont());
+            tmpGc.fillRectangle(image.getBounds());
             tmpGc.drawText(text, 0, 0);
         }
 
         // set transform to rotate
+        Transform oldTransform = new Transform(gc.getDevice());
+        gc.getTransform(oldTransform);
         Transform transform = new Transform(gc.getDevice());
         transform.translate(0, textWidth);
         transform.rotate(270);
         gc.setTransform(transform);
 
         // draw the image on the rotated graphics context
-        int height = getSize().y;
-        int y = (int) (height / 2d - textWidth / 2d);
-        if (y < 0) {
-            y = 0;
-        }
-        gc.drawImage(image, -y, 0);
+        int x = getBounds().x;
+        int y = getBounds().y;
+
+        gc.drawImage(image, -y, x);
+
+        gc.setTransform(oldTransform);
 
         // dispose resources
         tmpGc.dispose();

@@ -168,8 +168,6 @@ public class ChartLayout extends Layout {
         for (Control child : composite.getChildren()) {
             if (child instanceof Legend) {
                 legend = (Legend) child;
-            } else if (child instanceof ChartTitle) {
-                title = (ChartTitle) child;
             } else if (child instanceof PlotArea) {
                 plot = (PlotArea) child;
             }
@@ -188,6 +186,7 @@ public class ChartLayout extends Layout {
                     horizontalAxes = (Axis[]) axisSet.getYAxes();
                 }
             }
+            title = (ChartTitle) ((Chart) composite).getTitle();
         }
 
         if (title == null || legend == null || plot == null || axes == null) {
@@ -516,7 +515,6 @@ public class ChartLayout extends Layout {
     private void layoutBottomAxis(Rectangle r, AxisLayoutData layoutData) {
         int legendPosition = legend.getPosition();
 
-        int width = plotAreaWidth;
         int height = layoutData.titleLayoutdata.heightHint;
         int x = leftAxisWidth
                 + MARGIN
@@ -537,8 +535,9 @@ public class ChartLayout extends Layout {
                     + layoutData.tickLabelsLayoutdata.heightHint
                     + layoutData.tickMarksLayoutdata.heightHint;
         }
-        width = width > 0 ? width : 0;
-        layoutData.axisTitle.setBounds(x, y, width, height);
+        int width = layoutData.titleLayoutdata.widthHint;
+        int titleX = x + (plotAreaWidth - width) / 2;
+        layoutData.axisTitle.setBounds(titleX, y, width, height);
 
         height = layoutData.tickLabelsLayoutdata.heightHint;
         y -= height;
@@ -548,7 +547,7 @@ public class ChartLayout extends Layout {
         height = layoutData.tickMarksLayoutdata.heightHint;
         y -= height;
         bottomAxisOffset += height;
-        layoutData.axisTickMarks.setBounds(x, y, width, height);
+        layoutData.axisTickMarks.setBounds(x, y, plotAreaWidth, height);
     }
 
     /**
@@ -562,7 +561,6 @@ public class ChartLayout extends Layout {
     private void layoutTopAxis(Rectangle r, AxisLayoutData layoutData) {
         int legendPosition = legend.getPosition();
 
-        int width = plotAreaWidth;
         int height = layoutData.titleLayoutdata.heightHint;
         int x = leftAxisWidth
                 + MARGIN
@@ -572,8 +570,9 @@ public class ChartLayout extends Layout {
                 + ((titleHeight == 0) ? 0 : PADDING);
 
         topAxisOffset += height;
-        width = width > 0 ? width : 0;
-        layoutData.axisTitle.setBounds(x, y, width, height);
+        int width = layoutData.titleLayoutdata.widthHint;
+        int titleX = x + (plotAreaWidth - width) / 2;
+        layoutData.axisTitle.setBounds(titleX, y, width, height);
 
         y += height;
         height = layoutData.tickLabelsLayoutdata.heightHint;
@@ -583,7 +582,7 @@ public class ChartLayout extends Layout {
         y += height;
         height = layoutData.tickMarksLayoutdata.heightHint;
         topAxisOffset += height;
-        layoutData.axisTickMarks.setBounds(x, y, width, height);
+        layoutData.axisTickMarks.setBounds(x, y, plotAreaWidth, height);
     }
 
     /**
@@ -600,7 +599,6 @@ public class ChartLayout extends Layout {
         int yAxisMargin = Axis.MARGIN + AxisTickMarks.TICK_LENGTH;
 
         int width = layoutData.titleLayoutdata.widthHint;
-        int height = plotAreaHeight;
         int x = MARGIN
                 + leftAxisOffset
                 + (legendPosition == SWT.LEFT ? legendWidth
@@ -613,19 +611,20 @@ public class ChartLayout extends Layout {
                         + (legendHeight == 0 ? 0 : PADDING) : 0);
 
         leftAxisOffset += width;
-        height = height > 0 ? height : 0;
-        layoutData.axisTitle.setBounds(x, y, width, height);
+        int height = layoutData.titleLayoutdata.heightHint;
+        int titleY = y + (plotAreaHeight - height) / 2;
+        layoutData.axisTitle.setBounds(x, titleY, width, height);
 
         x += width;
         width = layoutData.tickLabelsLayoutdata.widthHint;
         leftAxisOffset += width;
-        layoutData.axisTickLabels.setBounds(x, y - yAxisMargin, width, height
-                + yAxisMargin * 2);
+        layoutData.axisTickLabels.setBounds(x, y - yAxisMargin, width,
+                plotAreaHeight + yAxisMargin * 2);
 
         x += width;
         width = layoutData.tickMarksLayoutdata.widthHint;
         leftAxisOffset += width;
-        layoutData.axisTickMarks.setBounds(x, y, width, height);
+        layoutData.axisTickMarks.setBounds(x, y, width, plotAreaHeight);
     }
 
     /**
@@ -642,7 +641,6 @@ public class ChartLayout extends Layout {
         int yAxisMargin = Axis.MARGIN + AxisTickMarks.TICK_LENGTH;
 
         int width = layoutData.titleLayoutdata.widthHint;
-        int height = plotAreaHeight;
         int x = r.width
                 - width
                 - rightAxisOffset
@@ -657,19 +655,20 @@ public class ChartLayout extends Layout {
                         + (legendHeight == 0 ? 0 : PADDING) : 0);
 
         rightAxisOffset += width;
-        height = height > 0 ? height : 0;
-        layoutData.axisTitle.setBounds(x, y, width, height);
+        int height = layoutData.titleLayoutdata.heightHint;
+        int titleY = y + (plotAreaHeight - height) / 2;
+        layoutData.axisTitle.setBounds(x, titleY, width, height);
 
         width = layoutData.tickLabelsLayoutdata.widthHint;
         x -= width;
         rightAxisOffset += width;
-        layoutData.axisTickLabels.setBounds(x, y - yAxisMargin, width, height
+        layoutData.axisTickLabels.setBounds(x, y - yAxisMargin, width, plotAreaHeight
                 + yAxisMargin * 2);
 
         width = layoutData.tickMarksLayoutdata.widthHint;
         x -= width;
         rightAxisOffset += width;
-        layoutData.axisTickMarks.setBounds(x, y, width, height);
+        layoutData.axisTickMarks.setBounds(x, y, width, plotAreaHeight);
     }
 
     /**

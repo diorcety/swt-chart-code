@@ -292,7 +292,8 @@ public class Legend extends Composite implements ILegend, PaintListener {
         ISeries[] seriesArray = sort(chart.getSeriesSet().getSeries());
 
         Rectangle r = chart.getClientArea();
-        int titleHeight = ((Composite) chart.getTitle()).getSize().y;
+        Rectangle titleBounds = ((Title) chart.getTitle()).getBounds();
+        int titleHeight = titleBounds.y + titleBounds.height;
         int cellHeight = Util.getExtentInGC(getFont(), "dummy").y;
 
         if (position == SWT.RIGHT || position == SWT.LEFT) {
@@ -309,7 +310,7 @@ public class Legend extends Composite implements ILegend, PaintListener {
                 int textWidth = Util.getExtentInGC(getFont(), label).x;
                 int cellWidth = textWidth + SYMBOL_WIDTH + MARGIN * 3;
                 maxCellWidth = Math.max(maxCellWidth, cellWidth);
-                if (yPosition + cellHeight < r.height - titleHeight
+                if (yPosition + cellHeight < r.height - titleHeight - MARGIN
                         || yPosition == MARGIN) {
                     yPosition += cellHeight + MARGIN;
                 } else {
