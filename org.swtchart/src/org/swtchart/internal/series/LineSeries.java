@@ -6,6 +6,9 @@
  *******************************************************************************/
 package org.swtchart.internal.series;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -444,7 +447,7 @@ public class LineSeries extends Series implements ILineSeries {
         // get x and y series
         double[] xseries = compressor.getCompressedXSeries();
         double[] yseries = compressor.getCompressedYSeries();
-        if (xseries.length == 0 || yseries.length == 0){
+        if (xseries.length == 0 || yseries.length == 0) {
             return;
         }
         int[] indexes = compressor.getCompressedIndexes();
@@ -485,38 +488,27 @@ public class LineSeries extends Series implements ILineSeries {
                 }
             }
         } else {
-            drawLine(gc, xAxis, yAxis, xseries, yseries, isHorizontal);
+            if (lineStyle == LineStyle.SOLID) {
+                drawLine(gc, xAxis, yAxis, xseries, yseries, isHorizontal);
+            } else if (lineStyle != LineStyle.NONE) {
+                drawLineWithStyle(gc, xAxis, yAxis, xseries, yseries,
+                        isHorizontal);
+            }
         }
 
         gc.setForeground(oldForeground);
     }
 
-    /**
-     * Draws the line segments.
-     * <p>
-     * When there are multiple data points at the same x pixel coordinate, it is
-     * inefficient to simply draw vertical lines connecting them by overlaying.
-     * Instead, only a single vertical line representing the overlaid multiple
-     * vertical lines is drawn at that x pixel coordinate.
-     * <p>
-     * That's why vertical line is handled differently from non-vertical line in
-     * this method.
-     * 
-     * @param gc
-     *            the graphic context
-     * @param xAxis
-     *            the x axis
-     * @param yAxis
-     *            the y axis
-     * @param xseries
-     *            the x series
-     * @param yseries
-     *            the y series
-     * @param isHorizontal
-     *            true if orientation is horizontal
+    /*
+     * This method basically does the same things as drawLineWithStyle(), but is
+     * kept being used. The reason is that, drawLineWithStyle() has a workaround
+     * for eclipse bug #243588, and there could be a case that the workaround
+     * doesn't work. To minimize the risk of side effect, this method remains
+     * for solid line style until that bug is fixed and the workaround is
+     * removed.
      */
-    private static void drawLine(GC gc, Axis xAxis, Axis yAxis, double[] xseries,
-            double[] yseries, boolean isHorizontal) {
+    private static void drawLine(GC gc, Axis xAxis, Axis yAxis,
+            double[] xseries, double[] yseries, boolean isHorizontal) {
         double xLower = xAxis.getRange().lower;
         double xUpper = xAxis.getRange().upper;
         double yLower = yAxis.getRange().lower;
@@ -568,6 +560,104 @@ public class LineSeries extends Series implements ILineSeries {
 
             prevX = x;
             prevY = y;
+        }
+    }
+
+    /**
+     * Draws the line segments with line style.
+     * <p>
+     * When there are multiple data points at the same x pixel coordinate, it is
+     * inefficient to simply draw vertical lines connecting them by overlaying.
+     * Instead, only a single vertical line representing the overlaid multiple
+     * vertical lines is drawn at that x pixel coordinate.
+     * <p>
+     * That's why vertical line is handled differently from non-vertical line in
+     * this method.
+     * 
+     * @param gc
+     *            the graphic context
+     * @param xAxis
+     *            the x axis
+     * @param yAxis
+     *            the y axis
+     * @param xseries
+     *            the x series
+     * @param yseries
+     *            the y series
+     * @param isHorizontal
+     *            true if orientation is horizontal
+     */
+    private static void drawLineWithStyle(GC gc, Axis xAxis, Axis yAxis,
+            double[] xseries, double[] yseries, boolean isHorizontal) {
+        double xLower = xAxis.getRange().lower;
+        double xUpper = xAxis.getRange().upper;
+        double yLower = yAxis.getRange().lower;
+        double yUpper = yAxis.getRange().upper;
+
+        List<Integer> pointList = new ArrayList<Integer>();
+        int prevX = xAxis.getPixelCoordinate(xseries[0], xLower, xUpper);
+        int prevY = yAxis.getPixelCoordinate(yseries[0], yLower, yUpper);
+
+        // add initial point
+        addPoint(pointList, prevX, prevY, isHorizontal);
+
+        boolean drawVerticalLine = false;
+        int verticalLineYLower = 0;
+        int verticalLineYUpper = 0;
+
+        for (int i = 0; i < xseries.length - 1; i++) {
+            int x = xAxis.getPixelCoordinate(xseries[i + 1], xLower, xUpper);
+            int y = yAxis.getPixelCoordinate(yseries[i + 1], yLower, yUpper);
+
+            if (x == prevX && i < xseries.length - 2) {
+                if (drawVerticalLine) {
+                    // extend vertical line
+                    verticalLineYLower = Math.min(verticalLineYLower, y);
+                    verticalLineYUpper = Math.max(verticalLineYUpper, y);
+                } else {
+                    // init vertical line
+                    verticalLineYLower = Math.min(prevY, y);
+                    verticalLineYUpper = Math.max(prevY, y);
+                    drawVerticalLine = true;
+                }
+            } else {
+
+                // add vertical line
+                if (drawVerticalLine) {
+                    addPoint(pointList, prevX, verticalLineYLower, isHorizontal);
+                    addPoint(pointList, prevX, verticalLineYUpper, isHorizontal);
+                    addPoint(pointList, prevX, prevY, isHorizontal);
+                }
+
+                // add non-vertical line
+                addPoint(pointList, x, y, isHorizontal);
+
+                drawVerticalLine = false;
+            }
+
+            prevX = x;
+            prevY = y;
+        }
+
+        int[] polyline = new int[pointList.size()];
+        for (int i = 0; i < polyline.length; i++) {
+            polyline[i] = pointList.get(i);
+        }
+
+        boolean advanced = gc.getAdvanced();
+        gc.setAdvanced(true); // workaround
+        gc.drawPolyline(polyline);
+        gc.setAdvanced(advanced);
+    }
+
+    private static void addPoint(List<Integer> pointList, int x, int y,
+            boolean isHorizontal) {
+        if (isHorizontal) {
+            pointList.add(Integer.valueOf(x));
+            pointList.add(Integer.valueOf(y));
+        } else {
+            pointList.add(Integer.valueOf(y));
+            pointList.add(Integer.valueOf(x));
         }
     }
 

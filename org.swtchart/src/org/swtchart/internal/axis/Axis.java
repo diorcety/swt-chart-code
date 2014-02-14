@@ -284,7 +284,10 @@ public class Axis implements IAxis {
             }
 
             // disable category axis
-            categoryAxisEnabled = false;
+            if (categoryAxisEnabled) {
+                categoryAxisEnabled = false;
+                ((SeriesSet) chart.getSeriesSet()).updateCompressor(this);
+            }
         }
 
         logScaleEnabled = enabled;
