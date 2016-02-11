@@ -864,7 +864,7 @@ public class AxisTickLabels implements PaintListener {
         } else {
             if (axis.isHorizontalAxis()) {
                 heightHint = Axis.MARGIN
-                        + Util.getExtentInGC(getFont(), "dummy").y;
+                        + Util.getExtentInGC(getFont(), null).y;
             } else {
                 widthHint = Axis.MARGIN;
             }
