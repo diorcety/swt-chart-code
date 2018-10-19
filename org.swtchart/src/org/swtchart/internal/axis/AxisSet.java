@@ -228,10 +228,6 @@ public class AxisSet implements IAxisSet {
      *            the direction
      */
     private void deleteAxis(int id, Direction direction) {
-        if (id == 0) {
-            SWT.error(SWT.ERROR_CANNOT_BE_ZERO);
-        }
-
         if (getAxisMap(direction).get(id) == null) {
             throw new IllegalArgumentException("Given axis id doesn't exist");
         }
@@ -242,11 +238,11 @@ public class AxisSet implements IAxisSet {
         for (ISeries series : chart.getSeriesSet().getSeries()) {
             if (direction == Direction.X) {
                 if (series.getXAxisId() == id) {
-                    series.setXAxisId(0);
+                    series.setXAxisId(-1);
                 }
             } else {
                 if (series.getYAxisId() == id) {
-                    series.setYAxisId(0);
+                    series.setYAxisId(-1);
                 }
             }
         }
