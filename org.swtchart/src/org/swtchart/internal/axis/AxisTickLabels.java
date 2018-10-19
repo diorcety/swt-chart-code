@@ -12,6 +12,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -274,9 +275,12 @@ public class AxisTickLabels implements PaintListener {
         while (cal.getTimeInMillis() < max) {
             tickLabelValues.add(Double.valueOf(cal.getTimeInMillis()));
             tickLabels.add(format(cal.getTimeInMillis()));
-            int tickLabelPosition = (int) ((cal.getTimeInMillis() - min)
+            double tickLabelPosition = ((cal.getTimeInMillis() - min)
                     / (max - min) * length);
-            tickLabelPositions.add(tickLabelPosition);
+            if (axis.isReversed()) {
+                tickLabelPosition = length - tickLabelPosition;
+            }
+            tickLabelPositions.add((int) tickLabelPosition);
             if (tickStepUnit == Calendar.MONTH) {
                 month += step;
                 if (month + step > Calendar.DECEMBER) {
@@ -288,6 +292,12 @@ public class AxisTickLabels implements PaintListener {
             }
             cal.clear();
             cal.set(year, month, 1);
+        }
+
+        if (axis.isReversed()) {
+            Collections.reverse(tickLabelPositions);
+            Collections.reverse(tickLabels);
+            Collections.reverse(tickLabelValues);
         }
     }
 
@@ -313,8 +323,17 @@ public class AxisTickLabels implements PaintListener {
         for (int i = 0; i < sizeOfTickLabels; i++) {
             tickLabels.add(series[i + initialIndex]);
 
-            int tickLabelPosition = (int) (length * (i + 0.5) / sizeOfTickLabels);
-            tickLabelPositions.add(tickLabelPosition);
+            double tickLabelPosition = (length * (i + 0.5) / sizeOfTickLabels);
+            if (axis.isReversed()) {
+                tickLabelPosition = length - tickLabelPosition;
+            }
+            tickLabelPositions.add((int) tickLabelPosition);
+        }
+
+        if (axis.isReversed()) {
+            Collections.reverse(tickLabelPositions);
+            Collections.reverse(tickLabels);
+            Collections.reverse(tickLabelValues);
         }
     }
 
@@ -356,12 +375,21 @@ public class AxisTickLabels implements PaintListener {
                 }
                 tickLabelValues.add(j.doubleValue());
 
-                int tickLabelPosition = (int) ((Math.log10(j.doubleValue()) - Math
+                double tickLabelPosition = ((Math.log10(j.doubleValue()) - Math
                         .log10(min)) / (Math.log10(max) - Math.log10(min)) * length);
-                tickLabelPositions.add(tickLabelPosition);
+                if (axis.isReversed()) {
+                    tickLabelPosition = length - tickLabelPosition;
+                }
+                tickLabelPositions.add((int) tickLabelPosition);
             }
             tickStep = tickStep.multiply(pow(10, 1));
             firstPosition = tickStep.add(pow(10, i));
+        }
+
+        if (axis.isReversed()) {
+            Collections.reverse(tickLabelPositions);
+            Collections.reverse(tickLabels);
+            Collections.reverse(tickLabelValues);
         }
     }
 
@@ -420,9 +448,18 @@ public class AxisTickLabels implements PaintListener {
             }
             tickLabelValues.add(b.doubleValue());
 
-            int tickLabelPosition = (int) ((b.doubleValue() - min)
+            double tickLabelPosition = ((b.doubleValue() - min)
                     / (max - min) * length);
-            tickLabelPositions.add(tickLabelPosition);
+            if (axis.isReversed()) {
+                tickLabelPosition = length - tickLabelPosition;
+            }
+            tickLabelPositions.add((int) tickLabelPosition);
+        }
+
+        if (axis.isReversed()) {
+            Collections.reverse(tickLabelPositions);
+            Collections.reverse(tickLabels);
+            Collections.reverse(tickLabelValues);
         }
     }
 

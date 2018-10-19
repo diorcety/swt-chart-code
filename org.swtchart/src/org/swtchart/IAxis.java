@@ -79,6 +79,11 @@ public interface IAxis {
      */
     Range getRange();
 
+
+    void setReversed(boolean reversed);
+
+    boolean isReversed();
+
     /**
      * Gets the axis title.
      * 
