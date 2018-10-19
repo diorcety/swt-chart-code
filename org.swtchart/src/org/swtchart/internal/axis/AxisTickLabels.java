@@ -478,6 +478,20 @@ public class AxisTickLabels implements PaintListener {
                 tickVisibilities.set(i, Boolean.FALSE);
             }
         }
+
+        if(axis.isLogScaleEnabled()) {
+            boolean isAnyVisible = false;
+            for(int i = 0; i < tickLabelPositions.size(); i++) {
+                if(tickVisibilities.get(i)) {
+                    isAnyVisible = true;
+                    break;
+                }
+            }
+            if(!isAnyVisible && tickVisibilities.size() > 0) {
+                tickVisibilities.set(0, Boolean.TRUE);
+                tickVisibilities.set(tickVisibilities.size() - 1, Boolean.TRUE);
+            }
+        }
     }
 
     /**
