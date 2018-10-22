@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.swtchart</groupId>
   <artifactId>swtchart</artifactId>
-  <version>0.10.1-X-SNAPSHOT</version>
+  <version>0.10.1-X</version>
 
   <properties>
     <swt.version>4.5.2</swt.version>
