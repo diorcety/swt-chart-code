@@ -1024,7 +1024,6 @@ public class AxisTickLabels implements PaintListener {
 
         // draw tick labels
         gc.setFont(axis.getTick().getFont());
-        int figureHeight = gc.textExtent("dummy").y;
         for (int i = 0; i < tickLabelPositions.size(); i++) {
             if (tickVisibilities.size() == 0 || tickLabels.size() == 0) {
                 break;
@@ -1036,9 +1035,12 @@ public class AxisTickLabels implements PaintListener {
                 if (tickLabels.get(0).startsWith("-") && !text.startsWith("-")) {
                     x += gc.textExtent("-").x;
                 }
+                int figureHeight = gc.textExtent(text).y;
                 int y = (int) (bounds.height - 1 - tickLabelPositions.get(i)
                         - figureHeight / 2.0 - margin);
-                gc.drawText(text, bounds.x + x, bounds.y + y);
+                if (bounds.y + y >= 0) {
+                    gc.drawText(text, bounds.x + x, bounds.y + y);
+                }
             }
         }
     }
