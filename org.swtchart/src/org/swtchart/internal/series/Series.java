@@ -584,12 +584,22 @@ abstract public class Series implements ISeries {
             return range;
         }
 
-        int lowerPixelCoordinate = axis.getPixelCoordinate(range.lower,
-                range.lower, range.upper)
+        int min = axis.getPixelCoordinate(range.lower,
+                range.lower, range.upper);
+
+        int max = axis.getPixelCoordinate(range.upper,
+                range.lower, range.upper);
+
+        if(axis.isReversed()) {
+            int  a = min;
+            min = max;
+            max = a;
+        }
+
+        int lowerPixelCoordinate = min
                 + lowerPlotMargin
                 * (axis.isHorizontalAxis() ? -1 : 1);
-        int upperPixelCoordinate = axis.getPixelCoordinate(range.upper,
-                range.lower, range.upper)
+        int upperPixelCoordinate = max
                 + upperPlotMargin
                 * (axis.isHorizontalAxis() ? 1 : -1);
 
@@ -597,6 +607,12 @@ abstract public class Series implements ISeries {
                 range.lower, range.upper);
         double upper = axis.getDataCoordinate(upperPixelCoordinate,
                 range.lower, range.upper);
+
+        if(axis.isReversed()) {
+            double  a = lower;
+            lower = upper;
+            upper = a;
+        }
 
         return new Range(lower, upper);
     }
