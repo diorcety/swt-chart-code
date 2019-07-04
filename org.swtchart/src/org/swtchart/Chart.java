@@ -80,6 +80,7 @@ public class Chart extends Composite implements Listener {
 
         updateLayout();
 
+        addListener(SWT.Dispose, this);
         addListener(SWT.Resize, this);
     }
 
@@ -285,6 +286,12 @@ public class Chart extends Composite implements Listener {
             updateLayout();
             redraw();
             break;
+        case SWT.Dispose:
+            title.dispose();
+            legend.dispose();
+            axisSet.dispose();
+            plotArea.dispose();
+            break;
         default:
             break;
         }
@@ -326,18 +333,6 @@ public class Chart extends Composite implements Listener {
         for (Control child : getChildren()) {
             child.update();
         }
-    }
-
-    /*
-     * @see Widget#dispose()
-     */
-    @Override
-    public void dispose() {
-        title.dispose();
-        legend.dispose();
-        axisSet.dispose();
-        plotArea.dispose();
-        super.dispose();
     }
 
     /*
