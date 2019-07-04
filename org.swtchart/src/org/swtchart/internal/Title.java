@@ -408,6 +408,7 @@ public class Title implements ITitle, PaintListener {
         // dispose resources
         tmpGc.dispose();
         transform.dispose();
+        oldTransform.dispose();
         image.dispose();
     }
 }
